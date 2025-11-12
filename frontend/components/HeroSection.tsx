@@ -22,24 +22,24 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative min-h-[80vh] sm:min-h-[85vh] lg:min-h-[90vh] flex items-center justify-center px-3 sm:px-4 lg:px-8 overflow-hidden bg-dark-bg"
+      className="relative min-h-[80vh] sm:min-h-[85vh] lg:min-h-[90vh] flex items-center justify-center px-3 sm:px-4 lg:px-8 overflow-hidden bg-light-bg dark:bg-dark-bg"
     >
       {/* Простой чистый градиент вместо сложного фона */}
-      <div className="absolute inset-0 bg-gradient-to-b from-dark-bg via-dark-bg to-dark-bg-secondary opacity-50"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-light-bg via-light-bg to-light-bg-secondary dark:from-dark-bg dark:via-dark-bg dark:to-dark-bg-secondary opacity-50"></div>
 
       {/* Контент */}
       <div className={`relative z-10 max-w-4xl mx-auto text-center ${mounted ? 'animate-fade-up' : 'opacity-0'}`}>
         {/* Badge - меньше на мобильном */}
-        <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-dark-bg-tertiary/80 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 mb-4 sm:mb-6 lg:mb-8 animate-fade-scale">
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-light-bg-tertiary/80 dark:bg-dark-bg-tertiary/80 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-light-bg-tertiary dark:border-white/10 mb-4 sm:mb-6 lg:mb-8 animate-fade-scale">
           <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-orange opacity-75"></span>
             <span className="relative inline-flex rounded-full h-full w-full bg-primary-orange"></span>
           </span>
-          <span className="text-xs sm:text-sm text-text-secondary font-medium">Powered by AI</span>
+          <span className="text-xs sm:text-sm text-light-text-secondary dark:text-dark-text-secondary font-medium">Powered by AI</span>
         </div>
 
         {/* Hero Title с градиентом - оптимизирован для мобильного */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary mb-3 sm:mb-4 lg:mb-6 tracking-tight leading-tight animate-fade-up delay-100 px-2">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-light-text-primary dark:text-dark-text-primary mb-3 sm:mb-4 lg:mb-6 tracking-tight leading-tight animate-fade-up delay-100 px-2">
           <span className="block">AutoHub</span>
           <span className="text-gradient animate-gradient inline-block">AI маркетплейс</span>
           <br className="hidden sm:block" />
@@ -47,7 +47,7 @@ export default function HeroSection() {
         </h1>
 
         {/* Subtitle - компактнее на мобильном */}
-        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-text-secondary mb-6 sm:mb-10 lg:mb-14 leading-relaxed max-w-2xl mx-auto px-2 sm:px-4 animate-fade-up delay-200">
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-light-text-secondary dark:text-dark-text-secondary mb-6 sm:mb-10 lg:mb-14 leading-relaxed max-w-2xl mx-auto px-2 sm:px-4 animate-fade-up delay-200">
           Искусственный интеллект автоматически обогащает ваши объявления.
           <br className="hidden sm:block" />
           <span className="text-primary-orange font-semibold">Публикуйте бесплатно</span> без регистрации.
@@ -66,13 +66,13 @@ export default function HeroSection() {
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               placeholder="Введите артикул или название запчасти..."
-              className={`w-full h-12 sm:h-14 lg:h-16 bg-dark-bg-secondary border ${
-                isFocused ? 'border-primary-orange' : 'border-white/10'
-              } rounded-xl px-4 sm:pl-12 pr-20 sm:pr-28 text-text-primary placeholder:text-text-muted focus:outline-none transition-colors duration-200 text-sm sm:text-base`}
+              className={`w-full h-12 sm:h-14 lg:h-16 bg-light-bg-secondary dark:bg-dark-bg-secondary border ${
+                isFocused ? 'border-primary-orange' : 'border-light-bg-tertiary dark:border-white/10'
+              } rounded-xl px-4 sm:pl-12 pr-20 sm:pr-28 text-light-text-primary dark:text-dark-text-primary placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted focus:outline-none transition-colors duration-200 text-sm sm:text-base`}
             />
 
             {/* Icon внутри input - только на планшетах и выше */}
-            <div className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 items-center gap-2 text-text-muted">
+            <div className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 items-center gap-2 text-light-text-muted dark:text-dark-text-muted">
               <span className="text-xl">🔍</span>
             </div>
 
@@ -89,13 +89,13 @@ export default function HeroSection() {
 
           {/* Подсказки под поиском */}
           <div className="flex items-center justify-center gap-3 mt-6 flex-wrap px-4">
-            <span className="text-sm text-text-muted">Популярные:</span>
+            <span className="text-sm text-light-text-muted dark:text-dark-text-muted">Популярные:</span>
             {['Двигатель', 'Коробка передач', 'Фары'].map((tag, idx) => (
               <button
                 key={tag}
                 type="button"
                 onClick={() => setSearchQuery(tag)}
-                className="text-sm text-text-secondary hover:text-primary-orange bg-dark-bg-tertiary/60 hover:bg-dark-bg-tertiary px-3 py-1.5 rounded-lg transition-all duration-200 border border-white/5 hover:border-primary-orange/30"
+                className="text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-primary-orange bg-light-bg-tertiary/60 dark:bg-dark-bg-tertiary/60 hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary px-3 py-1.5 rounded-lg transition-all duration-200 border border-light-bg-tertiary dark:border-white/5 hover:border-primary-orange/30"
               >
                 {tag}
               </button>
@@ -112,7 +112,7 @@ export default function HeroSection() {
           ].map((stat, idx) => (
             <div
               key={idx}
-              className="bg-dark-bg-secondary border border-white/5 rounded-xl p-3 sm:p-4 lg:p-6 hover:border-white/10 transition-colors duration-200"
+              className="bg-light-bg-secondary dark:bg-dark-bg-secondary border border-light-bg-tertiary dark:border-white/5 rounded-xl p-3 sm:p-4 lg:p-6 hover:border-light-bg-tertiary dark:hover:border-white/10 transition-colors duration-200"
             >
               <div className="text-center">
                 {/* Icon - только на desktop */}
@@ -126,7 +126,7 @@ export default function HeroSection() {
                 </div>
 
                 {/* Label */}
-                <div className="text-xs sm:text-sm text-text-muted">
+                <div className="text-xs sm:text-sm text-light-text-muted dark:text-dark-text-muted">
                   {stat.label}
                 </div>
               </div>

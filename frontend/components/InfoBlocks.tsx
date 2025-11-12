@@ -49,6 +49,15 @@ const features = [
     glowColor: 'rgba(236, 72, 153, 0.4)',
     stat: '0₽ за публикацию',
   },
+  {
+    icon: '🚗',
+    title: 'Широкий выбор',
+    subtitle: 'Все бренды',
+    description: 'Огромный каталог запчастей для всех популярных марок автомобилей. От эконом до премиум сегмента. Найдется все',
+    gradient: 'from-green-500/20 via-emerald-400/10 to-primary-orange/20',
+    glowColor: 'rgba(34, 197, 94, 0.4)',
+    stat: '50+ брендов',
+  },
 ]
 
 export default function InfoBlocks() {
@@ -114,7 +123,7 @@ export default function InfoBlocks() {
   }, [])
 
   return (
-    <section className="py-12 sm:py-16 lg:py-24 px-3 sm:px-4 lg:px-8 bg-dark-bg-secondary">
+    <section className="py-12 sm:py-16 lg:py-24 px-3 sm:px-4 lg:px-8 bg-light-bg-secondary dark:bg-dark-bg-secondary">
 
       <div className="container mx-auto relative z-10">
         {/* Section Header с улучшенной анимацией */}
@@ -126,14 +135,14 @@ export default function InfoBlocks() {
               : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="inline-flex items-center gap-2 bg-dark-bg-tertiary/60 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 mb-6 hover:border-primary-orange/30 transition-all duration-300 group">
+          <div className="inline-flex items-center gap-2 bg-light-bg-tertiary dark:bg-dark-bg-tertiary/60 backdrop-blur-sm px-4 py-2 rounded-full border border-light-bg-tertiary dark:border-white/10 mb-6 hover:border-primary-orange/30 transition-all duration-300 group">
             <span className="text-xl group-hover:scale-110 transition-transform">✨</span>
-            <span className="text-sm text-text-secondary font-medium">Преимущества платформы</span>
+            <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary font-medium">Преимущества платформы</span>
           </div>
-          <h2 className="text-3xl lg:text-5xl font-bold text-text-primary mb-6 leading-tight">
+          <h2 className="text-3xl lg:text-5xl font-bold text-light-text-primary dark:text-dark-text-primary mb-6 leading-tight">
             Почему <span className="text-gradient animate-gradient inline-block">AutoHub AI</span> — лучший выбор
           </h2>
-          <p className="text-text-secondary text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed">
+          <p className="text-light-text-secondary dark:text-dark-text-secondary text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed">
             Мы используем передовые AI-технологии для создания идеального опыта покупки и продажи автозапчастей.
             <span className="text-primary-orange font-semibold"> Быстро. Просто. Надежно.</span>
           </p>
@@ -145,7 +154,7 @@ export default function InfoBlocks() {
             <div
               key={feature.title}
               ref={el => { cardRefs.current[index] = el }}
-              className={`bg-dark-bg border border-white/5 rounded-xl p-6 sm:p-8 hover:border-white/10 transition-all duration-300 ${
+              className={`bg-light-bg dark:bg-dark-bg border border-light-bg-tertiary dark:border-white/5 rounded-xl p-6 sm:p-8 hover:border-light-bg-tertiary dark:hover:border-white/10 transition-all duration-300 ${
                 visibleCards[index]
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-10'
@@ -160,7 +169,7 @@ export default function InfoBlocks() {
               </div>
 
               {/* Title */}
-              <h3 className="text-lg lg:text-xl font-bold text-text-primary mb-2">
+              <h3 className="text-lg lg:text-xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
                 {feature.title}
               </h3>
 
@@ -170,7 +179,7 @@ export default function InfoBlocks() {
               </div>
 
               {/* Description */}
-              <p className="text-text-secondary leading-relaxed text-sm">
+              <p className="text-light-text-secondary dark:text-dark-text-secondary leading-relaxed text-sm">
                 {feature.description}
               </p>
             </div>
@@ -186,11 +195,11 @@ export default function InfoBlocks() {
               : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="bg-dark-bg border border-white/10 rounded-xl p-6 sm:p-8 lg:p-12 text-center">
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary mb-3 sm:mb-4 leading-tight">
+          <div className="bg-light-bg dark:bg-dark-bg border border-light-bg-tertiary dark:border-white/10 rounded-xl p-6 sm:p-8 lg:p-12 text-center">
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-light-text-primary dark:text-dark-text-primary mb-3 sm:mb-4 leading-tight">
               Готовы начать продажу автозапчастей?
             </h3>
-            <p className="text-text-secondary text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
+            <p className="text-light-text-secondary dark:text-dark-text-secondary text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">
               Опубликуйте объявление <span className="text-primary-orange font-medium">бесплатно и без регистрации</span>.
               AI создаст описание автоматически.
             </p>
@@ -205,14 +214,14 @@ export default function InfoBlocks() {
 
               <Link
                 href="/catalog"
-                className="border border-white/10 hover:border-white/20 text-text-secondary hover:text-text-primary px-6 py-3 rounded-lg font-medium transition-colors duration-200 w-full sm:w-auto"
+                className="border border-light-text-secondary dark:border-white/10 hover:border-light-text-primary dark:hover:border-white/20 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary px-6 py-3 rounded-lg font-medium transition-colors duration-200 w-full sm:w-auto"
               >
                 Смотреть каталог
               </Link>
             </div>
 
             {/* Trust indicators - упрощенные */}
-            <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 border-t border-white/5 text-center">
+            <div className="grid grid-cols-3 gap-4 sm:gap-6 pt-6 border-t border-light-bg-tertiary dark:border-white/5 text-center">
               {[
                 { value: '< 5 мин', label: 'Время' },
                 { value: '0₽', label: 'Стоимость' },
@@ -222,7 +231,7 @@ export default function InfoBlocks() {
                   <div className="text-lg sm:text-xl lg:text-2xl font-bold text-primary-orange mb-1">
                     {item.value}
                   </div>
-                  <div className="text-xs sm:text-sm text-text-muted">
+                  <div className="text-xs sm:text-sm text-light-text-muted dark:text-dark-text-muted">
                     {item.label}
                   </div>
                 </div>

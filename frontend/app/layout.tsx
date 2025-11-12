@@ -1,8 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import Header from '@/components/Header'
-import Footer from '@/components/Footer'
-import FloatingActionButton from '@/components/FloatingActionButton'
+import ClientLayout from '@/components/ClientLayout'
 
 export const metadata: Metadata = {
   title: 'AutoHub AI - Умный маркетплейс автозапчастей',
@@ -22,13 +20,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-1">
+      <head>
+        {/* Скрипт для предотвращения мигания темы при загрузке */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = localStorage.getItem('theme') || 'light';
+                  document.documentElement.classList.add(theme);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="flex flex-col min-h-screen bg-light-bg dark:bg-dark-bg text-light-text-primary dark:text-dark-text-primary transition-colors duration-300">
+        <ClientLayout>
           {children}
-        </main>
-        <Footer />
-        <FloatingActionButton />
+        </ClientLayout>
       </body>
     </html>
   )

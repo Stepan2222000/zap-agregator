@@ -39,7 +39,7 @@ export default function FloatingActionButton() {
           <span className="relative z-10 text-3xl">✨</span>
 
           {/* Tooltip */}
-          <div className="absolute right-full mr-4 bg-dark-bg-tertiary backdrop-blur-xl border border-white/10 text-text-primary text-sm font-semibold px-4 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <div className="absolute right-full mr-4 bg-light-bg-tertiary dark:bg-dark-bg-tertiary backdrop-blur-xl border border-light-bg-tertiary dark:border-white/10 text-light-text-primary dark:text-dark-text-primary text-sm font-semibold px-4 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Опубликовать
             <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full border-8 border-transparent border-l-dark-bg-tertiary"></div>
           </div>

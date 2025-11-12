@@ -67,7 +67,7 @@ export default function BrandCards() {
   }, [])
 
   return (
-    <section className="py-12 sm:py-16 lg:py-24 px-3 sm:px-4 lg:px-8 bg-dark-bg"
+    <section className="py-12 sm:py-16 lg:py-24 px-3 sm:px-4 lg:px-8 bg-light-bg dark:bg-dark-bg"
 >
 
       <div className="container mx-auto relative z-10">
@@ -80,14 +80,14 @@ export default function BrandCards() {
               : 'opacity-0 translate-y-10'
           }`}
         >
-          <div className="inline-flex items-center gap-2 bg-dark-bg-tertiary/60 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 mb-4 hover:border-primary-orange/30 transition-all duration-300 group">
+          <div className="inline-flex items-center gap-2 bg-light-bg-tertiary dark:bg-dark-bg-tertiary/60 backdrop-blur-sm px-4 py-2 rounded-full border border-light-bg-tertiary dark:border-white/10 mb-4 hover:border-primary-orange/30 transition-all duration-300 group">
             <span className="text-xl group-hover:scale-110 transition-transform">🚗</span>
-            <span className="text-sm text-text-secondary font-medium">Выберите бренд</span>
+            <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary font-medium">Выберите бренд</span>
           </div>
-          <h2 className="text-3xl lg:text-5xl font-bold text-text-primary mb-4 leading-tight">
+          <h2 className="text-3xl lg:text-5xl font-bold text-light-text-primary dark:text-dark-text-primary mb-4 leading-tight">
             Популярные <span className="text-gradient animate-gradient inline-block">бренды</span>
           </h2>
-          <p className="text-text-secondary text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-light-text-secondary dark:text-dark-text-secondary text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed">
             Найдите запчасти для вашего автомобиля среди <span className="text-primary-orange font-semibold">ведущих производителей</span>
           </p>
         </div>
@@ -108,14 +108,14 @@ export default function BrandCards() {
                 transitionDelay: visibleCards[index] ? `${index * 50}ms` : '0ms',
               }}
             >
-              <div className="bg-dark-bg-secondary border border-white/5 rounded-xl p-4 sm:p-6 lg:p-8 min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center hover:border-white/10 hover:bg-dark-bg-tertiary transition-colors duration-200">
+              <div className="bg-light-bg-secondary dark:bg-dark-bg-secondary border border-light-bg-tertiary dark:border-white/5 rounded-xl p-4 sm:p-6 lg:p-8 min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center hover:border-light-bg-tertiary dark:border-white/10 hover:bg-light-bg-tertiary dark:bg-dark-bg-tertiary transition-colors duration-200">
                 {/* Brand Icon - простая анимация */}
                 <div className="mb-2 sm:mb-3 text-4xl sm:text-5xl lg:text-6xl group-hover:scale-105 transition-transform duration-200">
                   {brand.icon}
                 </div>
 
                 {/* Brand Name */}
-                <span className="text-sm sm:text-base lg:text-lg font-semibold text-text-secondary group-hover:text-primary-orange transition-colors duration-200">
+                <span className="text-sm sm:text-base lg:text-lg font-semibold text-light-text-secondary dark:text-dark-text-secondary group-hover:text-primary-orange transition-colors duration-200">
                   {brand.name}
                 </span>
               </div>
@@ -127,7 +127,7 @@ export default function BrandCards() {
         <div className="text-center mt-8 sm:mt-12 lg:mt-16">
           <Link
             href="/catalog"
-            className="inline-flex items-center gap-2 bg-dark-bg-secondary hover:bg-dark-bg-tertiary border border-white/10 text-text-secondary hover:text-text-primary px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+            className="inline-flex items-center gap-2 bg-light-bg-secondary dark:bg-dark-bg-secondary hover:bg-light-bg-tertiary dark:bg-dark-bg-tertiary border border-light-bg-tertiary dark:border-white/10 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:text-dark-text-primary px-6 py-3 rounded-lg font-medium transition-colors duration-200"
           >
             <span>Показать все бренды</span>
             <span>→</span>
