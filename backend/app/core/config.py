@@ -13,10 +13,12 @@ class Settings(BaseSettings):
     DB_POOL_MIN_SIZE: int = 5
     DB_POOL_MAX_SIZE: int = 20
 
-    # AI Settings (placeholders для будущего)
+    # AI Settings
     VERTEX_AI_API_KEY: Optional[str] = None
     VERTEX_AI_ENDPOINT: Optional[str] = None
-    VERTEX_AI_MODEL: str = "gemini-2.0-flash-exp"
+    AI_MODEL: str = "gemini-2.0-flash-exp"
+    AI_MAX_RETRIES: int = 3
+    AI_TIMEOUT_SECONDS: int = 30
 
     # API Settings
     API_PREFIX: str = "/api"

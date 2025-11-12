@@ -1,5 +1,5 @@
 """
-Pydantic AE5<K 4;O 20;840F88 40==KE
+Pydantic схемы для валидации данных
 """
 from .listings import (
     ListingCreate,

@@ -12,6 +12,7 @@ from app.core.exceptions import (
 from app.core.logging_config import setup_logging
 from app.db.connection import db
 from app.api.routes import health
+from app.api.routes import listings
 
 # Настройка логирования
 setup_logging()
@@ -38,6 +39,7 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 # Роутеры
 app.include_router(health.router, prefix=settings.API_PREFIX, tags=["health"])
+app.include_router(listings.router, prefix=settings.API_PREFIX, tags=["listings"])
 
 
 @app.on_event("startup")
