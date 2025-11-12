@@ -58,6 +58,7 @@ export default function PublishPage() {
     formState: { errors },
     reset,
     watch,
+    setValue,
   } = useForm<ListingFormData>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
@@ -67,6 +68,61 @@ export default function PublishPage() {
 
   // Отслеживание прогресса заполнения формы
   const formValues = watch()
+
+  // Helper функция для проверки валидности поля
+  const isFieldValid = (fieldName: keyof ListingFormData): boolean => {
+    const value = formValues[fieldName]
+    const hasError = errors[fieldName]
+    const isFilled = value && String(value).trim() !== ''
+    return isFilled && !hasError
+  }
+
+  // Функция автоформатирования телефона: +7 (XXX) XXX-XX-XX
+  const formatPhoneNumber = (value: string): string => {
+    // Убираем все нецифровые символы
+    const digits = value.replace(/\D/g, '')
+
+    // Если начинается с 8, заменяем на 7
+    const normalizedDigits = digits.startsWith('8') ? '7' + digits.slice(1) : digits
+
+    // Форматируем по частям
+    if (normalizedDigits.length === 0) return ''
+    if (normalizedDigits.length <= 1) return `+${normalizedDigits}`
+    if (normalizedDigits.length <= 4) return `+${normalizedDigits[0]} (${normalizedDigits.slice(1)}`
+    if (normalizedDigits.length <= 7) return `+${normalizedDigits[0]} (${normalizedDigits.slice(1, 4)}) ${normalizedDigits.slice(4)}`
+    if (normalizedDigits.length <= 9) return `+${normalizedDigits[0]} (${normalizedDigits.slice(1, 4)}) ${normalizedDigits.slice(4, 7)}-${normalizedDigits.slice(7)}`
+
+    return `+${normalizedDigits[0]} (${normalizedDigits.slice(1, 4)}) ${normalizedDigits.slice(4, 7)}-${normalizedDigits.slice(7, 9)}-${normalizedDigits.slice(9, 11)}`
+  }
+
+  // Обработчик изменения телефона
+  const handlePhoneChange = (fieldName: 'contact_phone' | 'contact_whatsapp') => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value)
+    setValue(fieldName, formatted, { shouldValidate: true })
+  }
+
+  // Функция автоформатирования цены: добавляет пробелы между тысячами
+  const formatPrice = (value: string): string => {
+    // Убираем все нецифровые символы кроме точки
+    const cleaned = value.replace(/[^\d.]/g, '')
+
+    // Разделяем на целую и дробную части
+    const parts = cleaned.split('.')
+    const integerPart = parts[0]
+    const decimalPart = parts[1]
+
+    // Добавляем пробелы между тысячами
+    const formatted = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+
+    // Возвращаем с дробной частью, если она есть
+    return decimalPart !== undefined ? `${formatted}.${decimalPart}` : formatted
+  }
+
+  // Обработчик изменения цены
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPrice(e.target.value)
+    setValue('price', formatted, { shouldValidate: true })
+  }
 
   useEffect(() => {
     // Не включаем condition в прогресс, так как у него есть значение по умолчанию
@@ -263,15 +319,28 @@ export default function PublishPage() {
                     border-2 ${
                       errors.article_number
                         ? 'border-red-500 focus:border-red-600'
+                        : isFieldValid('article_number')
+                        ? 'border-green-500 dark:border-green-400 focus:border-green-600'
                         : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
                     }
                     text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
                     placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                    focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                    focus:outline-none focus:ring-4 ${
+                      isFieldValid('article_number')
+                        ? 'focus:ring-green-500/20'
+                        : 'focus:ring-primary-orange/20'
+                    }
                     transition-all duration-200
                     shadow-sm hover:shadow-md
                   `}
                 />
+                {isFieldValid('article_number') && (
+                  <div className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-green-600 dark:text-green-400 animate-in fade-in duration-200">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
               </div>
               {errors.article_number && (
                 <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
@@ -301,15 +370,28 @@ export default function PublishPage() {
                     border-2 ${
                       errors.brand
                         ? 'border-red-500 focus:border-red-600'
+                        : isFieldValid('brand')
+                        ? 'border-green-500 dark:border-green-400 focus:border-green-600'
                         : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
                     }
                     text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
                     placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                    focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                    focus:outline-none focus:ring-4 ${
+                      isFieldValid('brand')
+                        ? 'focus:ring-green-500/20'
+                        : 'focus:ring-primary-orange/20'
+                    }
                     transition-all duration-200
                     shadow-sm hover:shadow-md
                   `}
                 />
+                {isFieldValid('brand') && (
+                  <div className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-green-600 dark:text-green-400 animate-in fade-in duration-200">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
               </div>
               {errors.brand && (
                 <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
@@ -375,27 +457,41 @@ export default function PublishPage() {
                 </label>
                 <div className="relative">
                   <input
-                    {...register('price')}
-                    type="number"
+                    {...register('price', {
+                      onChange: handlePriceChange
+                    })}
+                    type="text"
                     id="price"
-                    placeholder="10000"
-                    step="0.01"
-                    min="0"
+                    placeholder="10 000"
+                    inputMode="decimal"
                     className={`
                       w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
                       bg-light-bg dark:bg-dark-bg
                       border-2 ${
                         errors.price
                           ? 'border-red-500 focus:border-red-600'
+                          : isFieldValid('price')
+                          ? 'border-green-500 dark:border-green-400 focus:border-green-600'
                           : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
                       }
                       text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
                       placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                      focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                      focus:outline-none focus:ring-4 ${
+                        isFieldValid('price')
+                          ? 'focus:ring-green-500/20'
+                          : 'focus:ring-primary-orange/20'
+                      }
                       transition-all duration-200
                       shadow-sm hover:shadow-md
                     `}
                   />
+                  {isFieldValid('price') && (
+                    <div className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-green-600 dark:text-green-400 animate-in fade-in duration-200">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
                 {errors.price && (
                   <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
@@ -488,7 +584,9 @@ export default function PublishPage() {
               </label>
               <div className="relative">
                 <input
-                  {...register('contact_phone')}
+                  {...register('contact_phone', {
+                    onChange: handlePhoneChange('contact_phone')
+                  })}
                   type="tel"
                   id="contact_phone"
                   placeholder="+7 (999) 123-45-67"
@@ -498,15 +596,28 @@ export default function PublishPage() {
                     border-2 ${
                       errors.contact_phone
                         ? 'border-red-500 focus:border-red-600'
+                        : isFieldValid('contact_phone')
+                        ? 'border-green-500 dark:border-green-400 focus:border-green-600'
                         : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
                     }
                     text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
                     placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                    focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                    focus:outline-none focus:ring-4 ${
+                      isFieldValid('contact_phone')
+                        ? 'focus:ring-green-500/20'
+                        : 'focus:ring-primary-orange/20'
+                    }
                     transition-all duration-200
                     shadow-sm hover:shadow-md
                   `}
                 />
+                {isFieldValid('contact_phone') && (
+                  <div className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-green-600 dark:text-green-400 animate-in fade-in duration-200">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
               </div>
               {errors.contact_phone && (
                 <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
@@ -526,7 +637,9 @@ export default function PublishPage() {
               </label>
               <div className="relative">
                 <input
-                  {...register('contact_whatsapp')}
+                  {...register('contact_whatsapp', {
+                    onChange: handlePhoneChange('contact_whatsapp')
+                  })}
                   type="tel"
                   id="contact_whatsapp"
                   placeholder="+7 (999) 123-45-67"
