@@ -125,15 +125,15 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Подсказки под поиском */}
-          <div className="flex items-center justify-center gap-3 mt-6 flex-wrap px-4">
-            <span className="text-sm text-light-text-muted dark:text-dark-text-muted">Популярные:</span>
-            {['Двигатель', 'Коробка передач', 'Фары'].map((tag, idx) => (
+          {/* Подсказки под поиском - улучшенный дизайн */}
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mt-6 sm:mt-8 flex-wrap px-4">
+            <span className="text-xs sm:text-sm text-light-text-muted dark:text-dark-text-muted font-medium">Популярные:</span>
+            {['Двигатель', 'Коробка передач', 'Фары', 'Подвеска'].map((tag) => (
               <button
                 key={tag}
                 type="button"
                 onClick={() => setSearchQuery(tag)}
-                className="text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-primary-orange bg-light-bg-tertiary/60 dark:bg-dark-bg-tertiary/60 hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary px-3 py-1.5 rounded-lg transition-all duration-200 border border-light-bg-tertiary dark:border-white/5 hover:border-primary-orange/30"
+                className="text-xs sm:text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-white bg-white/60 dark:bg-dark-bg-tertiary/60 hover:bg-primary-orange dark:hover:bg-primary-orange px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all duration-300 border border-gray-200 dark:border-white/5 hover:border-primary-orange shadow-sm hover:shadow-md hover:shadow-primary-orange/20 hover:scale-105 active:scale-95 font-medium backdrop-blur-sm"
               >
                 {tag}
               </button>
