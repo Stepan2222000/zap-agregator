@@ -1,107 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  /* Оптимизация scrolling и рендеринга */
   * {
-    -webkit-tap-highlight-color: transparent;
+    @apply box-border;
   }
 
   html {
-    scroll-behavior: smooth;
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-dark-bg text-text-primary antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-
-  /* Базовые стили для body */
-  body {
-    @apply bg-dark-bg text-dark-text antialiased;
-    font-size: 16px; /* Минимум 16px для мобильных, предотвращает zoom */
-    line-height: 1.6;
-  }
-
-  /* Темная тема по умолчанию */
-  :root {
-    color-scheme: dark;
-  }
-
-  /* Светлая тема */
-  .light {
-    @apply bg-light-bg text-light-text;
-  }
-
-  /* Типографика */
-  h1 {
-    @apply text-4xl font-bold tracking-tight;
-  }
-
-  h2 {
-    @apply text-3xl font-semibold tracking-tight;
-  }
-
-  h3 {
-    @apply text-2xl font-semibold;
-  }
-
-  p {
-    @apply text-base leading-relaxed;
-  }
-
-  /* Focus styles для доступности */
-  a:focus-visible,
-  button:focus-visible,
-  input:focus-visible {
-    @apply outline-2 outline-offset-2 outline-accent-blue;
-  }
-
-  /* Улучшение изображений */
-  img {
-    @apply max-w-full h-auto;
-  }
-}
-
-@layer components {
-  /* Кнопка - primary */
-  .btn-primary {
-    @apply px-6 py-3 bg-accent-blue hover:bg-accent-blue-dark
-           text-white font-medium rounded-xl
-           transition-all duration-200
-           hover:shadow-lg hover:scale-105
-           active:scale-95
-           disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  /* Кнопка - secondary */
-  .btn-secondary {
-    @apply px-6 py-3 bg-dark-surface hover:bg-dark-border
-           text-dark-text font-medium rounded-xl
-           transition-all duration-200
-           border border-dark-border;
-  }
-
-  /* Карточка */
-  .card {
-    @apply bg-card-light rounded-2xl shadow-card
-           p-6 transition-shadow duration-200
-           hover:shadow-xl;
   }
 }
 
 @layer utilities {
-  /* Анимация fade-in */
-  .fade-in {
-    animation: fadeIn 0.3s ease-in;
-  }
-
-  @keyframes fadeIn {
+  /* Анимация появления снизу */
+  @keyframes fade-up {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(30px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  /* Анимация появления с масштабированием */
+  @keyframes fade-scale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Плавающая анимация */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  /* Пульсирующий glow эффект */
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(217, 119, 87, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(217, 119, 87, 0.5);
+    }
+  }
+
+  /* Градиентная анимация */
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.6s ease-out forwards;
+  }
+
+  .animate-fade-scale {
+    animation: fade-scale 0.5s ease-out forwards;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  /* Стили для задержки анимаций */
+  .delay-100 {
+    animation-delay: 0.1s;
+  }
+
+  .delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  .delay-400 {
+    animation-delay: 0.4s;
+  }
+
+  /* Backdrop blur для стеклянного эффекта */
+  .glass-effect {
+    background: rgba(45, 45, 45, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Градиентный текст */
+  .text-gradient {
+    background: linear-gradient(135deg, #D97757 0%, #E8A87C 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Glow эффект для текста */
+  .text-glow {
+    text-shadow: 0 0 20px rgba(217, 119, 87, 0.5);
+  }
+
+  /* Мягкая тень для карточек */
+  .card-shadow {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Hover эффект для карточек */
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(217, 119, 87, 0.2);
+  }
+
+  /* Скрытие скроллбара, но оставляя функциональность */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }
