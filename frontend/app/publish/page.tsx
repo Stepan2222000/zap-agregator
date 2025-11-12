@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -49,18 +49,49 @@ export default function PublishPage() {
   const [error, setError] = useState<string | null>(null)
   const [successModalOpen, setSuccessModalOpen] = useState(false)
   const [createdListingId, setCreatedListingId] = useState<string>('')
+  const [formProgress, setFormProgress] = useState(0)
+  const [showStickyButton, setShowStickyButton] = useState(false)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<ListingFormData>({
     resolver: zodResolver(listingSchema),
     defaultValues: {
       condition: 'used',
     },
   })
+
+  // Отслеживание прогресса заполнения формы
+  const formValues = watch()
+
+  useEffect(() => {
+    // Не включаем condition в прогресс, так как у него есть значение по умолчанию
+    const requiredFields = ['article_number', 'price', 'brand', 'contact_phone']
+    const filledFields = requiredFields.filter(field => {
+      const value = formValues[field as keyof ListingFormData]
+      return value && String(value).trim() !== ''
+    })
+
+    // Учитываем фотографии как обязательное поле
+    const photosFilled = photos.length > 0 ? 1 : 0
+    const totalRequired = requiredFields.length + 1 // +1 для фотографий
+    const progress = Math.round(((filledFields.length + photosFilled) / totalRequired) * 100)
+
+    setFormProgress(progress)
+  }, [formValues, photos])
+
+  // Показывать sticky кнопку после скролла
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowStickyButton(window.scrollY > 300)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const onSubmit = async (data: ListingFormData) => {
     // Проверка наличия фотографий
@@ -137,17 +168,56 @@ export default function PublishPage() {
   }
 
   return (
-    <main className="min-h-screen bg-light-bg dark:bg-dark-bg py-8 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Заголовок */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-light-text-primary dark:text-dark-text-primary mb-3">
-            Подать объявление
-          </h1>
-          <p className="text-light-text-secondary dark:text-dark-text-secondary">
-            Заполните форму ниже, чтобы опубликовать объявление о продаже автозапчасти.
-            Все поля, отмеченные *, обязательны для заполнения.
-          </p>
+    <main className="min-h-screen bg-light-bg dark:bg-dark-bg py-6 sm:py-10 px-3 sm:px-4 lg:px-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Анимированный заголовок с прогресс-баром */}
+        <div className="mb-6 sm:mb-10">
+          {/* Hero заголовок */}
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary-orange/20 to-primary-orange/5 rounded-2xl sm:rounded-3xl mb-4 sm:mb-6 animate-pulse">
+              <span className="text-3xl sm:text-4xl">✨</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-light-text-primary dark:text-dark-text-primary mb-3 sm:mb-4">
+              <span className="bg-gradient-to-r from-primary-orange via-primary-orange-hover to-primary-orange bg-clip-text text-transparent">
+                Разместите
+              </span>{' '}
+              объявление
+            </h1>
+            <p className="text-base sm:text-lg text-light-text-secondary dark:text-dark-text-secondary max-w-2xl mx-auto px-2">
+              Заполните форму ниже, и мы автоматически обработаем ваше объявление с помощью AI
+            </p>
+          </div>
+
+          {/* Прогресс-бар заполнения */}
+          <div className="bg-light-bg-secondary/50 dark:bg-dark-bg-secondary/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-5 border border-light-bg-tertiary dark:border-white/5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm sm:text-base font-semibold text-light-text-primary dark:text-dark-text-primary">
+                Прогресс заполнения
+              </span>
+              <span className={`text-sm sm:text-base font-bold ${
+                formProgress === 100
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-primary-orange'
+              }`}>
+                {formProgress}%
+              </span>
+            </div>
+            <div className="h-2.5 sm:h-3 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all duration-500 ease-out rounded-full ${
+                  formProgress === 100
+                    ? 'bg-gradient-to-r from-green-500 to-green-600'
+                    : 'bg-gradient-to-r from-primary-orange to-primary-orange-hover'
+                }`}
+                style={{ width: `${formProgress}%` }}
+              />
+            </div>
+            {formProgress === 100 && (
+              <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 mt-2 font-medium animate-pulse">
+                ✓ Все обязательные поля заполнены!
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Ошибка */}
@@ -161,42 +231,51 @@ export default function PublishPage() {
         )}
 
         {/* Форма */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
           {/* Карточка с основной информацией */}
-          <div className="bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-xl p-6 space-y-5">
-            <h2 className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary">
-              Основная информация
-            </h2>
+          <div className="group bg-light-bg-secondary/80 dark:bg-dark-bg-secondary/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-5 sm:p-7 lg:p-8 space-y-5 sm:space-y-6 border border-light-bg-tertiary dark:border-white/5 hover:border-primary-orange/30 dark:hover:border-primary-orange/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary-orange/10">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary-orange/20 to-primary-orange/5 rounded-xl sm:rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                <span className="text-xl sm:text-2xl">📝</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-light-text-primary dark:text-dark-text-primary">
+                Основная информация
+              </h2>
+            </div>
 
             {/* Артикул */}
             <div>
               <label
                 htmlFor="article_number"
-                className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
+                className="block text-sm sm:text-base font-semibold text-light-text-primary dark:text-dark-text-primary mb-2.5"
               >
-                Артикул запчасти *
+                Артикул запчасти <span className="text-primary-orange">*</span>
               </label>
-              <input
-                {...register('article_number')}
-                type="text"
-                id="article_number"
-                placeholder="Например: 12345678"
-                className={`
-                  w-full px-4 py-3 rounded-lg
-                  bg-light-bg dark:bg-dark-bg
-                  border-2 ${
-                    errors.article_number
-                      ? 'border-red-500'
-                      : 'border-light-bg-tertiary dark:border-dark-bg-tertiary'
-                  }
-                  text-light-text-primary dark:text-dark-text-primary
-                  placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                  focus:border-primary-orange focus:outline-none
-                  transition-colors
-                `}
-              />
+              <div className="relative">
+                <input
+                  {...register('article_number')}
+                  type="text"
+                  id="article_number"
+                  placeholder="Например: 12345678"
+                  className={`
+                    w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
+                    bg-light-bg dark:bg-dark-bg
+                    border-2 ${
+                      errors.article_number
+                        ? 'border-red-500 focus:border-red-600'
+                        : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
+                    }
+                    text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
+                    placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
+                    focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                    transition-all duration-200
+                    shadow-sm hover:shadow-md
+                  `}
+                />
+              </div>
               {errors.article_number && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                  <span>⚠️</span>
                   {errors.article_number.message}
                 </p>
               )}
@@ -206,67 +285,81 @@ export default function PublishPage() {
             <div>
               <label
                 htmlFor="brand"
-                className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
+                className="block text-sm sm:text-base font-semibold text-light-text-primary dark:text-dark-text-primary mb-2.5"
               >
-                Марка автомобиля *
+                Марка автомобиля <span className="text-primary-orange">*</span>
               </label>
-              <input
-                {...register('brand')}
-                type="text"
-                id="brand"
-                placeholder="Например: Toyota, BMW, Lada"
-                className={`
-                  w-full px-4 py-3 rounded-lg
-                  bg-light-bg dark:bg-dark-bg
-                  border-2 ${
-                    errors.brand
-                      ? 'border-red-500'
-                      : 'border-light-bg-tertiary dark:border-dark-bg-tertiary'
-                  }
-                  text-light-text-primary dark:text-dark-text-primary
-                  placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                  focus:border-primary-orange focus:outline-none
-                  transition-colors
-                `}
-              />
+              <div className="relative">
+                <input
+                  {...register('brand')}
+                  type="text"
+                  id="brand"
+                  placeholder="Например: Toyota, BMW, Lada"
+                  className={`
+                    w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
+                    bg-light-bg dark:bg-dark-bg
+                    border-2 ${
+                      errors.brand
+                        ? 'border-red-500 focus:border-red-600'
+                        : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
+                    }
+                    text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
+                    placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
+                    focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                    transition-all duration-200
+                    shadow-sm hover:shadow-md
+                  `}
+                />
+              </div>
               {errors.brand && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                  <span>⚠️</span>
                   {errors.brand.message}
                 </p>
               )}
             </div>
 
             {/* Состояние и цена в одной строке на больших экранах */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               {/* Состояние */}
               <div>
                 <label
                   htmlFor="condition"
-                  className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
+                  className="block text-sm sm:text-base font-semibold text-light-text-primary dark:text-dark-text-primary mb-2.5"
                 >
-                  Состояние *
+                  Состояние <span className="text-primary-orange">*</span>
                 </label>
-                <select
-                  {...register('condition')}
-                  id="condition"
-                  className={`
-                    w-full px-4 py-3 rounded-lg
-                    bg-light-bg dark:bg-dark-bg
-                    border-2 ${
-                      errors.condition
-                        ? 'border-red-500'
-                        : 'border-light-bg-tertiary dark:border-dark-bg-tertiary'
-                    }
-                    text-light-text-primary dark:text-dark-text-primary
-                    focus:border-primary-orange focus:outline-none
-                    transition-colors cursor-pointer
-                  `}
-                >
-                  <option value="used">Б/У</option>
-                  <option value="new">Новое</option>
-                </select>
+                <div className="relative">
+                  <select
+                    {...register('condition')}
+                    id="condition"
+                    className={`
+                      w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
+                      bg-light-bg dark:bg-dark-bg
+                      border-2 ${
+                        errors.condition
+                          ? 'border-red-500 focus:border-red-600'
+                          : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
+                      }
+                      text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
+                      focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                      transition-all duration-200 cursor-pointer
+                      shadow-sm hover:shadow-md
+                      appearance-none
+                    `}
+                  >
+                    <option value="used">Б/У</option>
+                    <option value="new">Новое</option>
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-primary-orange">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
                 {errors.condition && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                    <span>⚠️</span>
                     {errors.condition.message}
                   </p>
                 )}
@@ -276,33 +369,37 @@ export default function PublishPage() {
               <div>
                 <label
                   htmlFor="price"
-                  className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
+                  className="block text-sm sm:text-base font-semibold text-light-text-primary dark:text-dark-text-primary mb-2.5"
                 >
-                  Цена (₽) *
+                  Цена (₽) <span className="text-primary-orange">*</span>
                 </label>
-                <input
-                  {...register('price')}
-                  type="number"
-                  id="price"
-                  placeholder="10000"
-                  step="0.01"
-                  min="0"
-                  className={`
-                    w-full px-4 py-3 rounded-lg
-                    bg-light-bg dark:bg-dark-bg
-                    border-2 ${
-                      errors.price
-                        ? 'border-red-500'
-                        : 'border-light-bg-tertiary dark:border-dark-bg-tertiary'
-                    }
-                    text-light-text-primary dark:text-dark-text-primary
-                    placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                    focus:border-primary-orange focus:outline-none
-                    transition-colors
-                  `}
-                />
+                <div className="relative">
+                  <input
+                    {...register('price')}
+                    type="number"
+                    id="price"
+                    placeholder="10000"
+                    step="0.01"
+                    min="0"
+                    className={`
+                      w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
+                      bg-light-bg dark:bg-dark-bg
+                      border-2 ${
+                        errors.price
+                          ? 'border-red-500 focus:border-red-600'
+                          : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
+                      }
+                      text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
+                      placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
+                      focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                      transition-all duration-200
+                      shadow-sm hover:shadow-md
+                    `}
+                  />
+                </div>
                 {errors.price && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                  <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                    <span>⚠️</span>
                     {errors.price.message}
                   </p>
                 )}
@@ -313,31 +410,35 @@ export default function PublishPage() {
             <div>
               <label
                 htmlFor="description"
-                className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
+                className="block text-sm sm:text-base font-semibold text-light-text-primary dark:text-dark-text-primary mb-2.5"
               >
-                Описание (необязательно)
+                Описание <span className="text-light-text-muted dark:text-dark-text-muted text-sm">(необязательно)</span>
               </label>
-              <textarea
-                {...register('description')}
-                id="description"
-                rows={4}
-                placeholder="Дополнительная информация о запчасти, состояние, особенности..."
-                className={`
-                  w-full px-4 py-3 rounded-lg
-                  bg-light-bg dark:bg-dark-bg
-                  border-2 ${
-                    errors.description
-                      ? 'border-red-500'
-                      : 'border-light-bg-tertiary dark:border-dark-bg-tertiary'
-                  }
-                  text-light-text-primary dark:text-dark-text-primary
-                  placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                  focus:border-primary-orange focus:outline-none
-                  transition-colors resize-y
-                `}
-              />
+              <div className="relative">
+                <textarea
+                  {...register('description')}
+                  id="description"
+                  rows={4}
+                  placeholder="Дополнительная информация о запчасти, состояние, особенности..."
+                  className={`
+                    w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
+                    bg-light-bg dark:bg-dark-bg
+                    border-2 ${
+                      errors.description
+                        ? 'border-red-500 focus:border-red-600'
+                        : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
+                    }
+                    text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
+                    placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
+                    focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                    transition-all duration-200 resize-y min-h-[120px]
+                    shadow-sm hover:shadow-md
+                  `}
+                />
+              </div>
               {errors.description && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                  <span>⚠️</span>
                   {errors.description.message}
                 </p>
               )}
@@ -345,10 +446,20 @@ export default function PublishPage() {
           </div>
 
           {/* Карточка с фотографиями */}
-          <div className="bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-xl p-6 space-y-5">
-            <h2 className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary">
-              Фотографии *
-            </h2>
+          <div className="group bg-light-bg-secondary/80 dark:bg-dark-bg-secondary/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-5 sm:p-7 lg:p-8 space-y-5 sm:space-y-6 border border-light-bg-tertiary dark:border-white/5 hover:border-primary-orange/30 dark:hover:border-primary-orange/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary-orange/10">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary-orange/20 to-primary-orange/5 rounded-xl sm:rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                <span className="text-xl sm:text-2xl">📸</span>
+              </div>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-light-text-primary dark:text-dark-text-primary">
+                  Фотографии <span className="text-primary-orange">*</span>
+                </h2>
+                <p className="text-sm text-light-text-muted dark:text-dark-text-muted">
+                  До 10 фотографий, макс. 5 МБ каждая
+                </p>
+              </div>
+            </div>
             <PhotoUpload
               onPhotosChange={setPhotos}
               maxPhotos={10}
@@ -357,40 +468,49 @@ export default function PublishPage() {
           </div>
 
           {/* Карточка с контактами */}
-          <div className="bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-xl p-6 space-y-5">
-            <h2 className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary">
-              Контактная информация
-            </h2>
+          <div className="group bg-light-bg-secondary/80 dark:bg-dark-bg-secondary/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-5 sm:p-7 lg:p-8 space-y-5 sm:space-y-6 border border-light-bg-tertiary dark:border-white/5 hover:border-primary-orange/30 dark:hover:border-primary-orange/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary-orange/10">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary-orange/20 to-primary-orange/5 rounded-xl sm:rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                <span className="text-xl sm:text-2xl">📞</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-light-text-primary dark:text-dark-text-primary">
+                Контактная информация
+              </h2>
+            </div>
 
             {/* Телефон */}
             <div>
               <label
                 htmlFor="contact_phone"
-                className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
+                className="block text-sm sm:text-base font-semibold text-light-text-primary dark:text-dark-text-primary mb-2.5"
               >
-                Телефон *
+                Телефон <span className="text-primary-orange">*</span>
               </label>
-              <input
-                {...register('contact_phone')}
-                type="tel"
-                id="contact_phone"
-                placeholder="+7 (999) 123-45-67"
-                className={`
-                  w-full px-4 py-3 rounded-lg
-                  bg-light-bg dark:bg-dark-bg
-                  border-2 ${
-                    errors.contact_phone
-                      ? 'border-red-500'
-                      : 'border-light-bg-tertiary dark:border-dark-bg-tertiary'
-                  }
-                  text-light-text-primary dark:text-dark-text-primary
-                  placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                  focus:border-primary-orange focus:outline-none
-                  transition-colors
-                `}
-              />
+              <div className="relative">
+                <input
+                  {...register('contact_phone')}
+                  type="tel"
+                  id="contact_phone"
+                  placeholder="+7 (999) 123-45-67"
+                  className={`
+                    w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
+                    bg-light-bg dark:bg-dark-bg
+                    border-2 ${
+                      errors.contact_phone
+                        ? 'border-red-500 focus:border-red-600'
+                        : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
+                    }
+                    text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
+                    placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
+                    focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                    transition-all duration-200
+                    shadow-sm hover:shadow-md
+                  `}
+                />
+              </div>
               {errors.contact_phone && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                  <span>⚠️</span>
                   {errors.contact_phone.message}
                 </p>
               )}
@@ -400,31 +520,35 @@ export default function PublishPage() {
             <div>
               <label
                 htmlFor="contact_whatsapp"
-                className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
+                className="block text-sm sm:text-base font-semibold text-light-text-primary dark:text-dark-text-primary mb-2.5"
               >
-                WhatsApp (необязательно)
+                WhatsApp <span className="text-light-text-muted dark:text-dark-text-muted text-sm">(необязательно)</span>
               </label>
-              <input
-                {...register('contact_whatsapp')}
-                type="tel"
-                id="contact_whatsapp"
-                placeholder="+7 (999) 123-45-67"
-                className={`
-                  w-full px-4 py-3 rounded-lg
-                  bg-light-bg dark:bg-dark-bg
-                  border-2 ${
-                    errors.contact_whatsapp
-                      ? 'border-red-500'
-                      : 'border-light-bg-tertiary dark:border-dark-bg-tertiary'
-                  }
-                  text-light-text-primary dark:text-dark-text-primary
-                  placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                  focus:border-primary-orange focus:outline-none
-                  transition-colors
-                `}
-              />
+              <div className="relative">
+                <input
+                  {...register('contact_whatsapp')}
+                  type="tel"
+                  id="contact_whatsapp"
+                  placeholder="+7 (999) 123-45-67"
+                  className={`
+                    w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
+                    bg-light-bg dark:bg-dark-bg
+                    border-2 ${
+                      errors.contact_whatsapp
+                        ? 'border-red-500 focus:border-red-600'
+                        : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
+                    }
+                    text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
+                    placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
+                    focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                    transition-all duration-200
+                    shadow-sm hover:shadow-md
+                  `}
+                />
+              </div>
               {errors.contact_whatsapp && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                  <span>⚠️</span>
                   {errors.contact_whatsapp.message}
                 </p>
               )}
@@ -434,55 +558,132 @@ export default function PublishPage() {
             <div>
               <label
                 htmlFor="contact_telegram"
-                className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
+                className="block text-sm sm:text-base font-semibold text-light-text-primary dark:text-dark-text-primary mb-2.5"
               >
-                Telegram (необязательно)
+                Telegram <span className="text-light-text-muted dark:text-dark-text-muted text-sm">(необязательно)</span>
               </label>
-              <input
-                {...register('contact_telegram')}
-                type="text"
-                id="contact_telegram"
-                placeholder="@username или номер телефона"
-                className={`
-                  w-full px-4 py-3 rounded-lg
-                  bg-light-bg dark:bg-dark-bg
-                  border-2 ${
-                    errors.contact_telegram
-                      ? 'border-red-500'
-                      : 'border-light-bg-tertiary dark:border-dark-bg-tertiary'
-                  }
-                  text-light-text-primary dark:text-dark-text-primary
-                  placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
-                  focus:border-primary-orange focus:outline-none
-                  transition-colors
-                `}
-              />
+              <div className="relative">
+                <input
+                  {...register('contact_telegram')}
+                  type="text"
+                  id="contact_telegram"
+                  placeholder="@username или номер телефона"
+                  className={`
+                    w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl
+                    bg-light-bg dark:bg-dark-bg
+                    border-2 ${
+                      errors.contact_telegram
+                        ? 'border-red-500 focus:border-red-600'
+                        : 'border-light-bg-tertiary dark:border-dark-bg-tertiary focus:border-primary-orange hover:border-primary-orange/50'
+                    }
+                    text-base sm:text-lg text-light-text-primary dark:text-dark-text-primary
+                    placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted
+                    focus:outline-none focus:ring-4 focus:ring-primary-orange/20
+                    transition-all duration-200
+                    shadow-sm hover:shadow-md
+                  `}
+                />
+              </div>
               {errors.contact_telegram && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                <p className="mt-2 text-sm sm:text-base text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                  <span>⚠️</span>
                   {errors.contact_telegram.message}
                 </p>
               )}
             </div>
           </div>
 
-          {/* Кнопка отправки */}
+          {/* Кнопка отправки - десктопная версия */}
+          <div className="hidden sm:block">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`
+                group relative w-full py-4 sm:py-5 px-6 sm:px-8 rounded-2xl sm:rounded-3xl font-bold text-base sm:text-lg
+                transition-all duration-300 overflow-hidden
+                ${
+                  isSubmitting
+                    ? 'bg-light-text-muted dark:bg-dark-text-muted border-2 border-light-text-muted dark:border-dark-text-muted cursor-not-allowed text-white'
+                    : 'bg-white/80 dark:bg-dark-bg-secondary/80 backdrop-blur-sm border-2 border-primary-orange text-primary-orange hover:border-primary-orange-hover hover:shadow-xl hover:shadow-primary-orange/20 hover:scale-[1.01] active:scale-[0.99]'
+                }
+                shadow-lg
+              `}
+            >
+              <span className="relative z-10 flex items-center justify-center gap-3">
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 sm:h-6 sm:w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Отправка...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-xl sm:text-2xl group-hover:scale-110 transition-transform duration-300">✨</span>
+                    <span>Опубликовать объявление</span>
+                  </>
+                )}
+              </span>
+            </button>
+          </div>
+
+          {/* Кнопка отправки - мобильная версия (не sticky) */}
+          <div className="block sm:hidden">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`
+                group relative w-full py-4 px-6 rounded-2xl font-bold text-base
+                transition-all duration-200 overflow-hidden
+                ${
+                  isSubmitting
+                    ? 'bg-light-text-muted dark:bg-dark-text-muted border-2 border-light-text-muted dark:border-dark-text-muted cursor-not-allowed text-white'
+                    : 'bg-white/80 dark:bg-dark-bg-secondary/80 backdrop-blur-sm border-2 border-primary-orange text-primary-orange active:border-primary-orange-hover active:scale-95 shadow-lg'
+                }
+              `}
+            >
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Отправка...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-xl">✨</span>
+                    <span>Опубликовать</span>
+                  </>
+                )}
+              </span>
+            </button>
+          </div>
+        </form>
+
+        {/* Sticky кнопка отправки для мобильных (появляется при скролле) */}
+        <div
+          className={`sm:hidden fixed bottom-0 left-0 right-0 z-40 p-4 bg-light-bg/95 dark:bg-dark-bg/95 backdrop-blur-xl border-t border-light-bg-tertiary dark:border-white/10 shadow-2xl transition-all duration-300 ${
+            showStickyButton && !isSubmitting
+              ? 'translate-y-0 opacity-100'
+              : 'translate-y-full opacity-0 pointer-events-none'
+          }`}
+        >
           <button
             type="submit"
+            form="publish-form"
             disabled={isSubmitting}
-            className={`
-              w-full py-4 px-6 rounded-lg font-semibold text-lg
-              transition-all duration-200
-              ${
-                isSubmitting
-                  ? 'bg-light-text-muted dark:bg-dark-text-muted cursor-not-allowed'
-                  : 'bg-primary-orange hover:bg-primary-orange-hover shadow-lg hover:shadow-xl'
-              }
-              text-white
-            `}
+            onClick={handleSubmit(onSubmit)}
+            className="group relative w-full py-4 px-6 rounded-2xl font-bold text-base bg-white/90 dark:bg-dark-bg-secondary/90 backdrop-blur-sm border-2 border-primary-orange text-primary-orange active:border-primary-orange-hover active:scale-95 transition-all duration-200 shadow-xl flex items-center justify-center gap-2 overflow-hidden"
           >
-            {isSubmitting ? 'Отправка...' : 'Опубликовать объявление'}
+            <span className="relative z-10 flex items-center gap-2">
+              <span className="text-xl">✨</span>
+              <span>Опубликовать объявление</span>
+            </span>
           </button>
-        </form>
+        </div>
       </div>
 
       {/* Success Modal */}
