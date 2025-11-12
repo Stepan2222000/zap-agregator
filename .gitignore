@@ -35,6 +35,10 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Credentials (Google Cloud service accounts, etc)
+credentials/
+*.json
+
 # IDEs
 .vscode/
 .idea/

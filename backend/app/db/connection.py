@@ -51,3 +51,11 @@ class Database:
 
 # Глобальный экземпляр
 db = Database()
+
+
+def get_db_connection():
+    """
+    Получить соединение из pool.
+    Используется как context manager.
+    """
+    return db.pool.acquire()

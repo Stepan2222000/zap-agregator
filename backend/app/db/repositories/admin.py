@@ -289,9 +289,9 @@ class AdminRepository:
         # Записываем в лог модерации
         log_query = """
             INSERT INTO moderation_log (listing_id, action, moderator_note)
-            VALUES ($1, 'reprocessed', 'Отправлено на повторную обработку AI')
+            VALUES ($1, 'reprocess_ai', 'Отправлено на повторную обработку AI')
         """
-        await self.connection.execute(log_query, listing_id, None)
+        await self.connection.execute(log_query, listing_id)
 
         logger.info(f"Объявление {listing_id} отправлено на повторную обработку AI")
         return True

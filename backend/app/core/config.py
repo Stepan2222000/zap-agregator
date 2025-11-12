@@ -13,10 +13,11 @@ class Settings(BaseSettings):
     DB_POOL_MIN_SIZE: int = 5
     DB_POOL_MAX_SIZE: int = 20
 
-    # AI Settings
-    VERTEX_AI_API_KEY: Optional[str] = None
-    VERTEX_AI_ENDPOINT: Optional[str] = None
-    AI_MODEL: str = "gemini-2.0-flash-exp"
+    # AI Settings (Vertex AI с Service Account)
+    VERTEX_AI_PROJECT_ID: str
+    VERTEX_AI_LOCATION: str = "us-central1"
+    VERTEX_AI_CREDENTIALS_PATH: str = "credentials/gen-lang-client-0026618973-4dbdd3b53fdc.json"
+    AI_MODEL: str = "google/gemini-2.5-pro"
     AI_MAX_RETRIES: int = 3
     AI_TIMEOUT_SECONDS: int = 30
 

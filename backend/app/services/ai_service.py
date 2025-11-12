@@ -1,5 +1,5 @@
 """
-Сервис для AI обработки объявлений через Gemini (Vertex AI)
+Сервис для AI обработки объявлений через Gemini (Vertex AI) с Service Account
 """
 from openai import OpenAI
 import asyncio
@@ -8,6 +8,10 @@ import logging
 from typing import Optional, Dict
 from uuid import UUID
 import httpx
+from pathlib import Path
+
+from google.oauth2 import service_account
+import google.auth.transport.requests
 
 from app.core.config import settings
 from app.db.listings_repository import listings_repo
@@ -52,39 +56,108 @@ LISTING_ENRICHMENT_PROMPT = """
 
 
 class AIService:
-    """Сервис для AI обработки объявлений"""
+    """Сервис для AI обработки объявлений через Vertex AI"""
 
     def __init__(self):
         """Инициализация AIService"""
         self.client = None
+        self.credentials = None
         self._initialize_client()
 
     def _initialize_client(self):
-        """Инициализировать OpenAI клиент с Vertex AI endpoint"""
-        if not settings.VERTEX_AI_API_KEY or not settings.VERTEX_AI_ENDPOINT:
-            logger.warning("⚠️ AI интеграция не настроена (нет API ключа или endpoint)")
+        """Инициализировать OpenAI клиент с Vertex AI endpoint и Service Account"""
+        if not settings.VERTEX_AI_PROJECT_ID or not settings.VERTEX_AI_CREDENTIALS_PATH:
+            logger.warning("⚠️ AI интеграция не настроена (нет PROJECT_ID или CREDENTIALS_PATH)")
             return
 
         try:
-            # Настройка httpx клиента с timeout (защита от зависания)
+            # Загрузка credentials из service account JSON файла
+            credentials_path = Path(settings.VERTEX_AI_CREDENTIALS_PATH)
+
+            # Проверка существования файла
+            if not credentials_path.exists():
+                # Пробуем относительно backend директории
+                backend_path = Path(__file__).parent.parent.parent / settings.VERTEX_AI_CREDENTIALS_PATH
+                if backend_path.exists():
+                    credentials_path = backend_path
+                else:
+                    logger.error(f"❌ Credentials файл не найден: {settings.VERTEX_AI_CREDENTIALS_PATH}")
+                    return
+
+            logger.info(f"📄 Загрузка credentials из: {credentials_path}")
+
+            # Загрузка service account credentials с правильными scopes
+            self.credentials = service_account.Credentials.from_service_account_file(
+                str(credentials_path),
+                scopes=['https://www.googleapis.com/auth/cloud-platform']
+            )
+
+            # Получение access token
+            auth_request = google.auth.transport.requests.Request()
+            self.credentials.refresh(auth_request)
+
+            logger.info(f"✅ Access token получен (истекает через ~1 час)")
+
+            # Формирование OpenAI-compatible endpoint для Vertex AI
+            base_url = (
+                f"https://{settings.VERTEX_AI_LOCATION}-aiplatform.googleapis.com"
+                f"/v1/projects/{settings.VERTEX_AI_PROJECT_ID}"
+                f"/locations/{settings.VERTEX_AI_LOCATION}/endpoints/openapi"
+            )
+
+            logger.info(f"🌐 Vertex AI endpoint: {base_url}")
+
+            # Настройка httpx клиента с timeout
             http_client = httpx.Client(
                 timeout=httpx.Timeout(
-                    connect=10.0,  # Timeout для установки соединения
-                    read=settings.AI_TIMEOUT_SECONDS,  # Timeout для чтения ответа
-                    write=10.0,  # Timeout для записи запроса
-                    pool=5.0  # Timeout для получения соединения из пула
+                    connect=10.0,
+                    read=settings.AI_TIMEOUT_SECONDS,
+                    write=10.0,
+                    pool=5.0
                 )
             )
 
+            # Создание OpenAI клиента с Vertex AI endpoint
             self.client = OpenAI(
-                api_key=settings.VERTEX_AI_API_KEY,
-                base_url=settings.VERTEX_AI_ENDPOINT,
+                api_key=self.credentials.token,
+                base_url=base_url,
                 http_client=http_client
             )
-            logger.info("✅ AI клиент инициализирован с timeout настройками")
+
+            logger.info("✅ AI клиент инициализирован с Service Account аутентификацией")
+
         except Exception as e:
             logger.error(f"❌ Ошибка инициализации AI клиента: {e}")
+            import traceback
+            logger.error(traceback.format_exc())
             self.client = None
+            self.credentials = None
+
+    def _refresh_token_if_needed(self):
+        """Обновить access token если истек или скоро истечет"""
+        if not self.credentials:
+            return False
+
+        try:
+            # Проверяем, нужно ли обновить токен
+            # google-auth автоматически проверяет expiry
+            if not self.credentials.valid:
+                logger.info("🔄 Access token истек, обновляем...")
+                auth_request = google.auth.transport.requests.Request()
+                self.credentials.refresh(auth_request)
+
+                # Обновляем токен в OpenAI клиенте
+                if self.client:
+                    self.client.api_key = self.credentials.token
+                    logger.info("✅ Access token обновлен")
+
+                return True
+
+            return True
+
+        except Exception as e:
+            logger.error(f"❌ Ошибка обновления токена: {e}")
+            return False
 
     async def process_listing(self, listing_id: UUID) -> bool:
         """
@@ -97,11 +170,19 @@ class AIService:
             True если обработка прошла успешно, False при ошибке
         """
         # Проверка наличия AI клиента
-        if not self.client:
+        if not self.client or not self.credentials:
             logger.warning(f"⚠️ AI клиент не инициализирован для listing {listing_id}")
             await self._handle_ai_error(
                 listing_id,
                 "AI интеграция не настроена. Проверьте конфигурацию."
+            )
+            return False
+
+        # Обновить токен если нужно
+        if not self._refresh_token_if_needed():
+            await self._handle_ai_error(
+                listing_id,
+                "Не удалось обновить access token для Vertex AI"
             )
             return False
 
@@ -173,6 +254,9 @@ class AIService:
             try:
                 logger.debug(f"🔄 AI попытка {attempt + 1}/{settings.AI_MAX_RETRIES}")
 
+                # Обновить токен перед каждой попыткой
+                self._refresh_token_if_needed()
+
                 # Вызов с timeout
                 response = await asyncio.wait_for(
                     self._call_ai(prompt),
@@ -218,6 +302,7 @@ class AIService:
         loop = asyncio.get_event_loop()
 
         # OpenAI SDK синхронный, запускаем в executor
+        # Добавляем grounding с Google Search для улучшенной обработки
         response = await loop.run_in_executor(
             None,
             lambda: self.client.chat.completions.create(
@@ -226,7 +311,8 @@ class AIService:
                     {
                         "role": "system",
                         "content": "You are a helpful assistant for an auto parts marketplace. "
-                                   "You help enrich product listings with accurate information."
+                                   "You help enrich product listings with accurate information. "
+                                   "Use web search to find current information about auto parts."
                     },
                     {
                         "role": "user",
@@ -234,7 +320,17 @@ class AIService:
                     }
                 ],
                 temperature=0.3,
-                max_tokens=1000
+                max_tokens=1500,
+                # Grounding с Google Search через правильную структуру extra_body
+                extra_body={
+                    "google": {
+                        "tools": [
+                            {
+                                "googleSearch": {}
+                            }
+                        ]
+                    }
+                }
             )
         )
 

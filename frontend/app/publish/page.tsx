@@ -14,7 +14,7 @@ const listingSchema = z.object({
     .min(1, 'Артикул обязателен')
     .max(255, 'Артикул слишком длинный'),
   condition: z.enum(['new', 'used'], {
-    errorMap: () => ({ message: 'Выберите состояние запчасти' }),
+    message: 'Выберите состояние запчасти',
   }),
   price: z.string()
     .min(1, 'Цена обязательна')

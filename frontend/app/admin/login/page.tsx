@@ -15,24 +15,17 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
-      // Проверяем токен через тестовый запрос к API
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/health`, {
-        headers: {
-          'X-Admin-Token': token,
-        },
-      });
-
-      if (response.ok || token) {
-        // Сохраняем токен в localStorage
+      // Для MVP просто сохраняем токен
+      // Реальная проверка токена произойдет на dashboard при запросе к API
+      if (token && token.trim()) {
         localStorage.setItem('adminToken', token);
-        // Редирект на dashboard
         router.push('/admin/dashboard');
       } else {
-        setError('Неверный токен администратора');
+        setError('Введите токен администратора');
+        setIsLoading(false);
       }
     } catch (err) {
-      setError('Ошибка подключения к серверу');
-    } finally {
+      setError('Произошла ошибка');
       setIsLoading(false);
     }
   };

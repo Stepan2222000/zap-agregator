@@ -18,3 +18,4 @@ Pillow==10.2.0
 # AI интеграция
 openai==1.10.0
 httpx==0.26.0
+google-auth==2.43.0

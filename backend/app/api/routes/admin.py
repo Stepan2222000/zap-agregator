@@ -46,8 +46,9 @@ router = APIRouter(
 
 @router.get("/listings", response_model=AdminListingsResponse)
 async def get_admin_listings(
-    status: Optional[str] = Query(
+    listing_status: Optional[str] = Query(
         None,
+        alias="status",
         description="Фильтр по статусу: processing, pending, approved, rejected",
     ),
     page: int = Query(1, ge=1, description="Номер страницы"),
@@ -63,10 +64,10 @@ async def get_admin_listings(
     - rejected: Отклонено
     """
     # Валидация статуса
-    if status and status not in ["processing", "pending", "approved", "rejected"]:
+    if listing_status and listing_status not in ["processing", "pending", "approved", "rejected"]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Неверный статус: {status}. Доступные: processing, pending, approved, rejected",
+            detail=f"Неверный статус: {listing_status}. Доступные: processing, pending, approved, rejected",
         )
 
     async with get_db_connection() as conn:
@@ -74,7 +75,7 @@ async def get_admin_listings(
 
         try:
             result = await admin_repo.get_listings(
-                status=status, page=page, limit=limit
+                status=listing_status, page=page, limit=limit
             )
 
             # Преобразуем в Pydantic модели
@@ -82,7 +83,7 @@ async def get_admin_listings(
             for item in result["items"]:
                 listings_data.append(
                     AdminListingPreview(
-                        id=item["id"],
+                        id=str(item["id"]),  # Конвертируем UUID в строку
                         article_number=item["article_number"],
                         brand=item["brand"],
                         price=item["price"],
@@ -133,9 +134,10 @@ async def get_admin_listing_detail(listing_id: str):
             photos = [
                 PhotoResponse(
                     id=photo["id"],
+                    listing_id=listing_data["id"],
                     filename=photo["filename"],
                     file_path=photo["file_path"],
-                    order=photo["display_order"],
+                    display_order=photo["display_order"],
                     created_at=photo["created_at"],
                 )
                 for photo in listing_data["photos"]
@@ -144,7 +146,7 @@ async def get_admin_listing_detail(listing_id: str):
             # Преобразуем историю модерации
             moderation_history = [
                 ModerationAction(
-                    id=action["id"],
+                    id=str(action["id"]),  # Конвертируем UUID в строку
                     action=action["action"],
                     moderator_note=action.get("moderator_note"),
                     created_at=action["created_at"],
@@ -154,7 +156,7 @@ async def get_admin_listing_detail(listing_id: str):
 
             # Создаем полный ответ
             return AdminListingWithHistory(
-                id=listing_data["id"],
+                id=str(listing_data["id"]),  # Конвертируем UUID в строку
                 article_number=listing_data["article_number"],
                 brand=listing_data["brand"],
                 condition=listing_data["condition"],
