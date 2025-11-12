@@ -26,17 +26,17 @@ export default function Header() {
       >
         <div className="container mx-auto px-3 sm:px-4 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20">
-            {/* Logo с анимацией - упрощенный для мобильного */}
+            {/* Logo с улучшенной анимацией */}
             <Link
               href="/"
-              className="text-xl sm:text-2xl lg:text-3xl font-bold text-text-primary hover:scale-105 transition-transform duration-300 flex items-center gap-1.5 sm:gap-2"
+              className="text-xl sm:text-2xl lg:text-3xl font-bold text-text-primary hover:scale-105 transition-all duration-300 flex items-center gap-1.5 sm:gap-2 group"
             >
-              <span className="relative">
+              <span className="relative transition-all duration-300">
                 AutoHub
-                {/* Пульсирующая точка только на desktop */}
-                <span className="hidden sm:block absolute -top-1 -right-1 w-2 h-2 bg-primary-orange rounded-full animate-pulse"></span>
+                {/* Пульсирующая точка */}
+                <span className="hidden sm:block absolute -top-1 -right-1 w-2 h-2 bg-primary-orange rounded-full animate-pulse group-hover:scale-125 transition-transform"></span>
               </span>
-              <span className="text-gradient">AI</span>
+              <span className="text-gradient bg-gradient-to-r from-primary-orange to-primary-orange-hover animate-gradient">AI</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -57,15 +57,15 @@ export default function Header() {
               </Link>
             </nav>
 
-            {/* CTA Button с градиентом и glow - компактнее на мобильном */}
+            {/* CTA Button с улучшенными эффектами */}
             <div className="flex items-center gap-2 sm:gap-3">
               <Link
                 href="/publish"
-                className="relative group bg-gradient-to-r from-primary-orange to-primary-orange-hover text-white text-sm sm:text-base px-3 py-2 sm:px-6 sm:py-2.5 lg:px-8 lg:py-3 rounded-lg sm:rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-primary-orange/30 hover:scale-105 overflow-hidden"
+                className="relative group bg-gradient-to-r from-primary-orange to-primary-orange-hover text-white text-xs sm:text-base px-3 py-2 sm:px-5 sm:py-2.5 lg:px-8 lg:py-3 rounded-lg sm:rounded-xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-primary-orange/40 hover:scale-105 overflow-hidden"
               >
                 <span className="relative z-10 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
-                  {/* Показываем только emoji на мобильном */}
-                  <span className="sm:hidden text-base">✨</span>
+                  {/* На мобильном кратко */}
+                  <span className="sm:hidden">✨ Опубл.</span>
                   {/* Полный текст на планшетах и выше */}
                   <span className="hidden sm:inline">✨ Опубликовать</span>
                 </span>

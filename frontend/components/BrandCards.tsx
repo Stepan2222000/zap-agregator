@@ -108,14 +108,14 @@ export default function BrandCards() {
                 transitionDelay: visibleCards[index] ? `${index * 50}ms` : '0ms',
               }}
             >
-              <div className="bg-dark-bg-secondary border border-white/5 rounded-xl p-4 sm:p-6 lg:p-8 min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center hover:border-white/10 hover:bg-dark-bg-tertiary transition-colors duration-200">
-                {/* Brand Icon - простая анимация */}
-                <div className="mb-2 sm:mb-3 text-4xl sm:text-5xl lg:text-6xl group-hover:scale-105 transition-transform duration-200">
+              <div className="bg-dark-bg-secondary border border-white/5 rounded-xl p-4 sm:p-6 lg:p-8 min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center hover:border-primary-orange/30 hover:bg-dark-bg-tertiary transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary-orange/10">
+                {/* Brand Icon - улучшенная анимация */}
+                <div className="mb-2 sm:mb-3 text-4xl sm:text-5xl lg:text-6xl group-hover:scale-110 transition-all duration-300 group-hover:rotate-3">
                   {brand.icon}
                 </div>
 
                 {/* Brand Name */}
-                <span className="text-sm sm:text-base lg:text-lg font-semibold text-text-secondary group-hover:text-primary-orange transition-colors duration-200">
+                <span className="text-sm sm:text-base lg:text-lg font-semibold text-text-secondary group-hover:text-primary-orange transition-colors duration-300">
                   {brand.name}
                 </span>
               </div>
@@ -123,14 +123,14 @@ export default function BrandCards() {
           ))}
         </div>
 
-        {/* View All Button - упрощенный */}
+        {/* View All Button - с улучшенными эффектами */}
         <div className="text-center mt-8 sm:mt-12 lg:mt-16">
           <Link
             href="/catalog"
-            className="inline-flex items-center gap-2 bg-dark-bg-secondary hover:bg-dark-bg-tertiary border border-white/10 text-text-secondary hover:text-text-primary px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+            className="group inline-flex items-center gap-2 bg-dark-bg-secondary hover:bg-dark-bg-tertiary border border-white/10 hover:border-primary-orange/30 text-text-secondary hover:text-primary-orange px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-primary-orange/10"
           >
             <span>Показать все бренды</span>
-            <span>→</span>
+            <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
           </Link>
         </div>
       </div>

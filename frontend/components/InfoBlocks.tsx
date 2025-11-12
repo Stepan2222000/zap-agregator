@@ -145,32 +145,32 @@ export default function InfoBlocks() {
             <div
               key={feature.title}
               ref={el => { cardRefs.current[index] = el }}
-              className={`bg-dark-bg border border-white/5 rounded-xl p-6 sm:p-8 hover:border-white/10 transition-all duration-300 ${
+              className={`group bg-dark-bg border border-white/5 rounded-xl p-6 sm:p-8 hover:border-primary-orange/30 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-primary-orange/10 ${
                 visibleCards[index]
-                  ? 'opacity-100 translate-y-0'
-                  : 'opacity-0 translate-y-10'
+                  ? 'opacity-100 translate-y-0 scale-100'
+                  : 'opacity-0 translate-y-10 scale-95'
               }`}
               style={{
                 transitionDelay: visibleCards[index] ? `${index * 100}ms` : '0ms',
               }}
             >
-              {/* Icon - простая анимация */}
-              <div className="mb-4 text-5xl lg:text-6xl">
+              {/* Icon - улучшенная анимация */}
+              <div className="mb-4 text-5xl lg:text-6xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
                 {feature.icon}
               </div>
 
               {/* Title */}
-              <h3 className="text-lg lg:text-xl font-bold text-text-primary mb-2">
+              <h3 className="text-lg lg:text-xl font-bold text-text-primary mb-2 group-hover:text-primary-orange transition-colors duration-300">
                 {feature.title}
               </h3>
 
-              {/* Subtitle badge - упрощенный */}
-              <div className="inline-flex items-center gap-1 text-primary-orange text-xs font-medium mb-3">
+              {/* Subtitle badge - с анимацией */}
+              <div className="inline-flex items-center gap-1 text-primary-orange text-xs font-medium mb-3 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                 {feature.subtitle}
               </div>
 
               {/* Description */}
-              <p className="text-text-secondary leading-relaxed text-sm">
+              <p className="text-text-secondary leading-relaxed text-sm group-hover:text-text-primary/80 transition-colors duration-300">
                 {feature.description}
               </p>
             </div>
@@ -198,16 +198,18 @@ export default function InfoBlocks() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
               <Link
                 href="/publish"
-                className="bg-primary-orange hover:bg-primary-orange-hover text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 w-full sm:w-auto"
+                className="group bg-primary-orange hover:bg-primary-orange-hover text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 w-full sm:w-auto hover:scale-105 hover:shadow-xl hover:shadow-primary-orange/40 flex items-center justify-center gap-2"
               >
-                Опубликовать объявление
+                <span>Опубликовать объявление</span>
+                <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
               </Link>
 
               <Link
                 href="/catalog"
-                className="border border-white/10 hover:border-white/20 text-text-secondary hover:text-text-primary px-6 py-3 rounded-lg font-medium transition-colors duration-200 w-full sm:w-auto"
+                className="group border border-white/10 hover:border-primary-orange/30 text-text-secondary hover:text-primary-orange px-6 py-3 rounded-lg font-medium transition-all duration-300 w-full sm:w-auto hover:scale-105 hover:shadow-lg hover:shadow-primary-orange/10 flex items-center justify-center gap-2"
               >
-                Смотреть каталог
+                <span>Смотреть каталог</span>
+                <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
               </Link>
             </div>
 
