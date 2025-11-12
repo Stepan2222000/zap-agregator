@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE: int = 5 * 1024 * 1024  # 5MB
     MAX_PHOTOS_PER_LISTING: int = 10
 
+    # Admin Settings
+    ADMIN_TOKEN: str = "simple-token-for-mvp"  # Токен для единственного модератора
+
     class Config:
         env_file = ".env"
         case_sensitive = False
