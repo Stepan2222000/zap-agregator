@@ -134,14 +134,18 @@ class ListingStatusResponse(BaseModel):
     Схема для проверки статуса объявления
     Используется для GET /api/listings/{id}/status
     """
+    listing_id: UUID = Field(..., description="ID объявления")
     status: Literal['processing', 'pending', 'approved', 'rejected'] = Field(..., description="Текущий статус")
     ai_error_message: Optional[str] = Field(None, description="Ошибка AI (если есть)")
+    updated_at: datetime = Field(..., description="Время последнего обновления")
 
     class Config:
         from_attributes = True
         json_schema_extra = {
             "example": {
+                "listing_id": "550e8400-e29b-41d4-a716-446655440000",
                 "status": "pending",
-                "ai_error_message": None
+                "ai_error_message": None,
+                "updated_at": "2024-01-15T10:30:00"
             }
         }

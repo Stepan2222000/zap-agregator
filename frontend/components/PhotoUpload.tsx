@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, DragEvent, ChangeEvent } from 'react'
+import { useState, useRef, useEffect, DragEvent, ChangeEvent } from 'react'
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 interface PhotoUploadProps {
@@ -21,6 +21,19 @@ export default function PhotoUpload({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+
+  // Cleanup previews при размонтировании компонента (защита от memory leak)
+  useEffect(() => {
+    return () => {
+      previews.forEach((preview) => {
+        try {
+          URL.revokeObjectURL(preview)
+        } catch (e) {
+          // Ignore - URL уже был revoked или невалиден
+        }
+      })
+    }
+  }, [previews])
 
   // Валидация файла
   const validateFile = (file: File): string | null => {

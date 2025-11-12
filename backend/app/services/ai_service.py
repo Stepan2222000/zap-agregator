@@ -7,6 +7,7 @@ import json
 import logging
 from typing import Optional, Dict
 from uuid import UUID
+import httpx
 
 from app.core.config import settings
 from app.db.listings_repository import listings_repo
@@ -65,11 +66,22 @@ class AIService:
             return
 
         try:
+            # Настройка httpx клиента с timeout (защита от зависания)
+            http_client = httpx.Client(
+                timeout=httpx.Timeout(
+                    connect=10.0,  # Timeout для установки соединения
+                    read=settings.AI_TIMEOUT_SECONDS,  # Timeout для чтения ответа
+                    write=10.0,  # Timeout для записи запроса
+                    pool=5.0  # Timeout для получения соединения из пула
+                )
+            )
+
             self.client = OpenAI(
                 api_key=settings.VERTEX_AI_API_KEY,
-                base_url=settings.VERTEX_AI_ENDPOINT
+                base_url=settings.VERTEX_AI_ENDPOINT,
+                http_client=http_client
             )
-            logger.info("✅ AI клиент инициализирован")
+            logger.info("✅ AI клиент инициализирован с timeout настройками")
         except Exception as e:
             logger.error(f"❌ Ошибка инициализации AI клиента: {e}")
             self.client = None

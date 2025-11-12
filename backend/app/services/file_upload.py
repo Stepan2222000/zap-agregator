@@ -31,6 +31,13 @@ class FileUploadService:
     # Разрешенные расширения
     ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"]
 
+    # Magic bytes для проверки реального типа файла (защита от подделки MIME)
+    MAGIC_BYTES = {
+        b'\xFF\xD8\xFF': 'image/jpeg',  # JPEG
+        b'\x89PNG\r\n\x1a\n': 'image/png',  # PNG
+        b'RIFF': 'image/webp',  # WebP (нужна дополнительная проверка)
+    }
+
     def __init__(self):
         """Инициализация сервиса"""
         self.upload_dir = Path(settings.UPLOAD_DIR)
@@ -81,6 +88,45 @@ class FileUploadService:
                     detail=f"Недопустимое расширение файла: {file_ext}"
                 )
 
+    def _verify_file_type_by_magic_bytes(self, file_content: bytes, filename: str) -> None:
+        """
+        Проверка реального типа файла через magic bytes (защита от подделки MIME)
+
+        Args:
+            file_content: Содержимое файла
+            filename: Имя файла для логирования
+
+        Raises:
+            HTTPException: если файл не является изображением
+        """
+        if len(file_content) < 12:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Файл {filename} слишком маленький или поврежден"
+            )
+
+        # Проверка magic bytes
+        is_valid = False
+
+        # Проверка JPEG (FF D8 FF)
+        if file_content[:3] == b'\xFF\xD8\xFF':
+            is_valid = True
+
+        # Проверка PNG (89 50 4E 47 0D 0A 1A 0A)
+        elif file_content[:8] == b'\x89PNG\r\n\x1a\n':
+            is_valid = True
+
+        # Проверка WebP (RIFF....WEBP)
+        elif file_content[:4] == b'RIFF' and file_content[8:12] == b'WEBP':
+            is_valid = True
+
+        if not is_valid:
+            logger.warning(f"⚠️ Файл {filename} не является изображением (проверка magic bytes)")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Файл {filename} не является изображением. Загружайте только JPEG, PNG или WebP."
+            )
+
     async def save_photos(
         self,
         listing_id: UUID,
@@ -107,22 +153,50 @@ class FileUploadService:
 
         for order, file in enumerate(files):
             try:
-                # Генерация уникального имени файла
+                # Генерация уникального имени файла с санитизацией расширения
                 file_ext = Path(file.filename).suffix.lower()
-                unique_filename = f"{uuid.uuid4()}{file_ext}"
-                file_path = listing_dir / unique_filename
 
-                # Чтение файла
-                file_content = await file.read()
+                # Санитизация расширения (защита от path traversal)
+                safe_ext = file_ext.replace('..', '').replace('/', '').replace('\\', '').replace('\x00', '')
 
-                # Проверка размера
-                if len(file_content) > settings.MAX_FILE_SIZE:
-                    logger.warning(f"⚠️ Файл {file.filename} слишком большой: {len(file_content)} байт")
+                # Дополнительная проверка - убедиться, что это разрешенное расширение
+                if safe_ext not in self.ALLOWED_EXTENSIONS:
+                    logger.warning(f"⚠️ Попытка загрузить файл с недопустимым расширением: {file.filename}")
                     raise HTTPException(
                         status_code=400,
-                        detail=f"Файл {file.filename} превышает максимальный размер "
-                               f"{settings.MAX_FILE_SIZE / 1024 / 1024}MB"
+                        detail=f"Недопустимое расширение файла. Разрешены: JPEG, PNG, WebP"
                     )
+
+                unique_filename = f"{uuid.uuid4()}{safe_ext}"
+                file_path = listing_dir / unique_filename
+
+                # Chunked reading с проверкой размера (защита от DoS)
+                total_size = 0
+                chunks = []
+                chunk_size = 8192  # 8KB chunks
+
+                while True:
+                    chunk = await file.read(chunk_size)
+                    if not chunk:
+                        break
+
+                    total_size += len(chunk)
+
+                    # Проверка размера после каждого chunk
+                    if total_size > settings.MAX_FILE_SIZE:
+                        logger.warning(f"⚠️ Файл {file.filename} слишком большой: {total_size} байт")
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Файл {file.filename} превышает максимальный размер "
+                                   f"{settings.MAX_FILE_SIZE / 1024 / 1024}MB"
+                        )
+
+                    chunks.append(chunk)
+
+                file_content = b''.join(chunks)
+
+                # Проверка реального типа файла через magic bytes (защита от подделки MIME)
+                self._verify_file_type_by_magic_bytes(file_content, file.filename)
 
                 # Сохранить временный файл
                 temp_path = listing_dir / f"temp_{unique_filename}"
