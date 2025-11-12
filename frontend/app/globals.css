@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Оптимизация scrolling и рендеринга */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Базовые стили для body */
+  body {
+    @apply bg-dark-bg text-dark-text antialiased;
+    font-size: 16px; /* Минимум 16px для мобильных, предотвращает zoom */
+    line-height: 1.6;
+  }
+
+  /* Темная тема по умолчанию */
+  :root {
+    color-scheme: dark;
+  }
+
+  /* Светлая тема */
+  .light {
+    @apply bg-light-bg text-light-text;
+  }
+
+  /* Типографика */
+  h1 {
+    @apply text-4xl font-bold tracking-tight;
+  }
+
+  h2 {
+    @apply text-3xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold;
+  }
+
+  p {
+    @apply text-base leading-relaxed;
+  }
+
+  /* Focus styles для доступности */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent-blue;
+  }
+
+  /* Улучшение изображений */
+  img {
+    @apply max-w-full h-auto;
+  }
+}
+
+@layer components {
+  /* Кнопка - primary */
+  .btn-primary {
+    @apply px-6 py-3 bg-accent-blue hover:bg-accent-blue-dark
+           text-white font-medium rounded-xl
+           transition-all duration-200
+           hover:shadow-lg hover:scale-105
+           active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Кнопка - secondary */
+  .btn-secondary {
+    @apply px-6 py-3 bg-dark-surface hover:bg-dark-border
+           text-dark-text font-medium rounded-xl
+           transition-all duration-200
+           border border-dark-border;
+  }
+
+  /* Карточка */
+  .card {
+    @apply bg-card-light rounded-2xl shadow-card
+           p-6 transition-shadow duration-200
+           hover:shadow-xl;
+  }
+}
+
+@layer utilities {
+  /* Анимация fade-in */
+  .fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
