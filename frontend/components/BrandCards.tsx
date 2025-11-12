@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
 const brands = [
@@ -19,82 +19,118 @@ const brands = [
 ]
 
 export default function BrandCards() {
-  const [hoveredBrand, setHoveredBrand] = useState<string | null>(null)
+  const [visibleCards, setVisibleCards] = useState<boolean[]>(new Array(brands.length).fill(false))
+  const [isHeaderVisible, setIsHeaderVisible] = useState(false)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([])
+
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px',
+    }
+
+    // Header observer
+    const headerObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setIsHeaderVisible(true)
+        }
+      })
+    }, observerOptions)
+
+    // Cards observer
+    const cardsObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const index = cardRefs.current.findIndex(ref => ref === entry.target)
+          if (index !== -1) {
+            setVisibleCards(prev => {
+              const newVisible = [...prev]
+              newVisible[index] = true
+              return newVisible
+            })
+          }
+        }
+      })
+    }, observerOptions)
+
+    if (headerRef.current) headerObserver.observe(headerRef.current)
+    cardRefs.current.forEach(ref => {
+      if (ref) cardsObserver.observe(ref)
+    })
+
+    return () => {
+      headerObserver.disconnect()
+      cardsObserver.disconnect()
+    }
+  }, [])
 
   return (
-    <section className="py-20 lg:py-32 px-4 lg:px-8 bg-dark-bg relative overflow-hidden">
-      {/* Декоративные элементы фона */}
-      <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary-orange/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-primary-orange/5 rounded-full blur-3xl"></div>
+    <section className="py-12 sm:py-16 lg:py-24 px-3 sm:px-4 lg:px-8 bg-dark-bg"
+>
 
       <div className="container mx-auto relative z-10">
-        {/* Section Header */}
-        <div className="text-center mb-12 lg:mb-16">
-          <div className="inline-flex items-center gap-2 bg-dark-bg-tertiary/60 px-4 py-2 rounded-full border border-white/10 mb-4">
-            <span className="text-xl">🚗</span>
+        {/* Section Header с анимацией */}
+        <div
+          ref={headerRef}
+          className={`text-center mb-12 lg:mb-16 transition-all duration-1000 ${
+            isHeaderVisible
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <div className="inline-flex items-center gap-2 bg-dark-bg-tertiary/60 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 mb-4 hover:border-primary-orange/30 transition-all duration-300 group">
+            <span className="text-xl group-hover:scale-110 transition-transform">🚗</span>
             <span className="text-sm text-text-secondary font-medium">Выберите бренд</span>
           </div>
-          <h2 className="text-3xl lg:text-5xl font-bold text-text-primary mb-4">
-            Популярные <span className="text-gradient">бренды</span>
+          <h2 className="text-3xl lg:text-5xl font-bold text-text-primary mb-4 leading-tight">
+            Популярные <span className="text-gradient animate-gradient inline-block">бренды</span>
           </h2>
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            Найдите запчасти для вашего автомобиля среди ведущих производителей
+          <p className="text-text-secondary text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed">
+            Найдите запчасти для вашего автомобиля среди <span className="text-primary-orange font-semibold">ведущих производителей</span>
           </p>
         </div>
 
-        {/* Brands Grid */}
+        {/* Brands Grid с анимациями появления */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 lg:gap-6 max-w-7xl mx-auto">
           {brands.map((brand, index) => (
             <Link
               key={brand.name}
               href={`/catalog?brand=${brand.name}`}
-              onMouseEnter={() => setHoveredBrand(brand.name)}
-              onMouseLeave={() => setHoveredBrand(null)}
-              className="group relative"
+              ref={el => { cardRefs.current[index] = el }}
+              className={`group relative transition-all duration-700 ${
+                visibleCards[index]
+                  ? 'opacity-100 translate-y-0 scale-100'
+                  : 'opacity-0 translate-y-20 scale-95'
+              }`}
               style={{
-                animationDelay: `${index * 0.05}s`,
+                transitionDelay: visibleCards[index] ? `${index * 50}ms` : '0ms',
               }}
             >
-              <div className="relative bg-dark-bg-tertiary/80 backdrop-blur-sm border border-white/5 rounded-2xl p-6 lg:p-8 min-h-[140px] flex flex-col items-center justify-center transition-all duration-300 hover:border-primary-orange/30 hover:bg-dark-bg-tertiary card-hover">
-                {/* Glow эффект при hover */}
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br from-primary-orange/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl`}
-                ></div>
-
-                {/* Badge с количеством запчастей */}
-                <div className="absolute top-2 right-2 bg-primary-orange/20 text-primary-orange text-xs font-bold px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  {Math.floor(Math.random() * 100) + 20}+
-                </div>
-
-                {/* Brand Icon */}
-                <div className="relative mb-3 text-5xl lg:text-6xl group-hover:scale-110 transition-transform duration-300">
+              <div className="bg-dark-bg-secondary border border-white/5 rounded-xl p-4 sm:p-6 lg:p-8 min-h-[100px] sm:min-h-[120px] flex flex-col items-center justify-center hover:border-white/10 hover:bg-dark-bg-tertiary transition-colors duration-200">
+                {/* Brand Icon - простая анимация */}
+                <div className="mb-2 sm:mb-3 text-4xl sm:text-5xl lg:text-6xl group-hover:scale-105 transition-transform duration-200">
                   {brand.icon}
-                  {/* Animated ring */}
-                  <div className="absolute inset-0 border-2 border-primary-orange rounded-full opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-500"></div>
                 </div>
 
                 {/* Brand Name */}
-                <span className="text-base lg:text-lg font-bold text-text-secondary group-hover:text-primary-orange transition-colors duration-300">
+                <span className="text-sm sm:text-base lg:text-lg font-semibold text-text-secondary group-hover:text-primary-orange transition-colors duration-200">
                   {brand.name}
                 </span>
-
-                {/* Hover indicator */}
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-xs text-text-muted">Смотреть →</span>
-                </div>
               </div>
             </Link>
           ))}
         </div>
 
-        {/* View All Button */}
-        <div className="text-center mt-12 lg:mt-16">
+        {/* View All Button - упрощенный */}
+        <div className="text-center mt-8 sm:mt-12 lg:mt-16">
           <Link
             href="/catalog"
-            className="inline-flex items-center gap-2 bg-dark-bg-tertiary/60 hover:bg-dark-bg-tertiary border border-white/10 hover:border-primary-orange/30 text-text-secondary hover:text-primary-orange px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
+            className="inline-flex items-center gap-2 bg-dark-bg-secondary hover:bg-dark-bg-tertiary border border-white/10 text-text-secondary hover:text-text-primary px-6 py-3 rounded-lg font-medium transition-colors duration-200"
           >
             <span>Показать все бренды</span>
-            <span className="text-xl">→</span>
+            <span>→</span>
           </Link>
         </div>
       </div>

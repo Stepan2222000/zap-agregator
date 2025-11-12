@@ -21,79 +21,70 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative min-h-[85vh] lg:min-h-[90vh] flex items-center justify-center px-4 lg:px-8 overflow-hidden">
-      {/* Анимированный градиентный фон */}
-      <div className="absolute inset-0 bg-gradient-to-br from-dark-bg via-dark-bg-secondary to-dark-bg">
-        {/* Анимированные круги для визуального интереса */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-orange/10 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-primary-orange/5 rounded-full blur-3xl animate-float delay-200"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary-orange/5 rounded-full blur-3xl"></div>
-      </div>
+    <section
+      className="relative min-h-[80vh] sm:min-h-[85vh] lg:min-h-[90vh] flex items-center justify-center px-3 sm:px-4 lg:px-8 overflow-hidden bg-dark-bg"
+    >
+      {/* Простой чистый градиент вместо сложного фона */}
+      <div className="absolute inset-0 bg-gradient-to-b from-dark-bg via-dark-bg to-dark-bg-secondary opacity-50"></div>
 
       {/* Контент */}
       <div className={`relative z-10 max-w-4xl mx-auto text-center ${mounted ? 'animate-fade-up' : 'opacity-0'}`}>
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 bg-dark-bg-tertiary/80 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10 mb-6 lg:mb-8 animate-fade-scale">
-          <span className="relative flex h-2 w-2">
+        {/* Badge - меньше на мобильном */}
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-dark-bg-tertiary/80 backdrop-blur-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 mb-4 sm:mb-6 lg:mb-8 animate-fade-scale">
+          <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-orange opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-orange"></span>
+            <span className="relative inline-flex rounded-full h-full w-full bg-primary-orange"></span>
           </span>
-          <span className="text-sm text-text-secondary font-medium">Powered by AI</span>
+          <span className="text-xs sm:text-sm text-text-secondary font-medium">Powered by AI</span>
         </div>
 
-        {/* Hero Title с градиентом */}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary mb-4 lg:mb-6 tracking-tight leading-tight animate-fade-up delay-100">
+        {/* Hero Title с градиентом - оптимизирован для мобильного */}
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-text-primary mb-3 sm:mb-4 lg:mb-6 tracking-tight leading-tight animate-fade-up delay-100 px-2">
           <span className="block">AutoHub</span>
           <span className="text-gradient animate-gradient inline-block">AI маркетплейс</span>
           <br className="hidden sm:block" />
-          <span className="block mt-2">автозапчастей</span>
+          <span className="block mt-1 sm:mt-2">автозапчастей</span>
         </h1>
 
-        {/* Subtitle */}
-        <p className="text-base sm:text-lg lg:text-xl text-text-secondary mb-10 lg:mb-14 leading-relaxed max-w-2xl mx-auto px-4 animate-fade-up delay-200">
+        {/* Subtitle - компактнее на мобильном */}
+        <p className="text-sm sm:text-base md:text-lg lg:text-xl text-text-secondary mb-6 sm:mb-10 lg:mb-14 leading-relaxed max-w-2xl mx-auto px-2 sm:px-4 animate-fade-up delay-200">
           Искусственный интеллект автоматически обогащает ваши объявления.
           <br className="hidden sm:block" />
           <span className="text-primary-orange font-semibold">Публикуйте бесплатно</span> без регистрации.
         </p>
 
-        {/* Search Bar с анимацией */}
+        {/* Search Bar - упрощенный */}
         <form
           onSubmit={handleSearch}
-          className={`relative max-w-2xl mx-auto animate-fade-up delay-300 ${
-            isFocused ? 'scale-105' : 'scale-100'
-          } transition-transform duration-300`}
+          className="relative max-w-2xl mx-auto animate-fade-up delay-300"
         >
-          <div className={`relative group ${isFocused ? 'ring-2 ring-primary-orange/50' : ''} rounded-2xl transition-all duration-300`}>
-            {/* Glow эффект */}
-            <div className={`absolute -inset-1 bg-gradient-to-r from-primary-orange to-primary-orange-hover rounded-2xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 ${isFocused ? 'opacity-50' : ''}`}></div>
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              placeholder="Введите артикул или название запчасти..."
+              className={`w-full h-12 sm:h-14 lg:h-16 bg-dark-bg-secondary border ${
+                isFocused ? 'border-primary-orange' : 'border-white/10'
+              } rounded-xl px-4 sm:pl-12 pr-20 sm:pr-28 text-text-primary placeholder:text-text-muted focus:outline-none transition-colors duration-200 text-sm sm:text-base`}
+            />
 
-            {/* Input */}
-            <div className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                placeholder="Введите артикул или название запчасти..."
-                className="w-full h-16 lg:h-18 bg-dark-bg-tertiary/90 backdrop-blur-xl border border-white/10 rounded-2xl pl-6 pr-32 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary-orange/50 transition-all duration-300 text-base lg:text-lg font-medium"
-              />
-
-              {/* Icons внутри input */}
-              <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-2">
-                <span className="text-2xl">🔍</span>
-              </div>
-
-              {/* Search button */}
-              <button
-                type="submit"
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-gradient-to-r from-primary-orange to-primary-orange-hover text-white px-6 lg:px-8 h-12 lg:h-14 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-primary-orange/30 hover:scale-105 flex items-center gap-2"
-                aria-label="Поиск"
-              >
-                <span className="hidden sm:inline">Найти</span>
-                <span className="sm:hidden text-xl">→</span>
-              </button>
+            {/* Icon внутри input - только на планшетах и выше */}
+            <div className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 items-center gap-2 text-text-muted">
+              <span className="text-xl">🔍</span>
             </div>
+
+            {/* Search button - упрощенный */}
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary-orange hover:bg-primary-orange-hover text-white px-4 sm:px-6 h-8 sm:h-10 lg:h-12 rounded-lg font-medium transition-colors duration-200"
+              aria-label="Поиск"
+            >
+              <span className="hidden sm:inline">Найти</span>
+              <span className="sm:hidden">→</span>
+            </button>
           </div>
 
           {/* Подсказки под поиском */}
@@ -112,27 +103,35 @@ export default function HeroSection() {
           </div>
         </form>
 
-        {/* Stats или features */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 mt-16 lg:mt-20 max-w-3xl mx-auto animate-fade-up delay-400">
-          <div className="text-center">
-            <div className="text-3xl lg:text-4xl font-bold text-gradient mb-2">1000+</div>
-            <div className="text-sm lg:text-base text-text-secondary">Запчастей в каталоге</div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl lg:text-4xl font-bold text-gradient mb-2">99%</div>
-            <div className="text-sm lg:text-base text-text-secondary">Точность AI</div>
-          </div>
-          <div className="text-center col-span-2 lg:col-span-1">
-            <div className="text-3xl lg:text-4xl font-bold text-gradient mb-2">24/7</div>
-            <div className="text-sm lg:text-base text-text-secondary">Доступность</div>
-          </div>
-        </div>
+        {/* Stats cards - минималистичный дизайн */}
+        <div className="grid grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mt-12 sm:mt-16 lg:mt-20 max-w-3xl mx-auto animate-fade-up delay-400">
+          {[
+            { value: '1000+', label: 'Запчастей', icon: '🔧' },
+            { value: '99%', label: 'Точность AI', icon: '🤖' },
+            { value: '24/7', label: 'Доступность', icon: '⚡' },
+          ].map((stat, idx) => (
+            <div
+              key={idx}
+              className="bg-dark-bg-secondary border border-white/5 rounded-xl p-3 sm:p-4 lg:p-6 hover:border-white/10 transition-colors duration-200"
+            >
+              <div className="text-center">
+                {/* Icon - только на desktop */}
+                <div className="text-2xl sm:text-3xl lg:text-4xl mb-2 hidden sm:block">
+                  {stat.icon}
+                </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce hidden lg:block">
-          <div className="w-6 h-10 border-2 border-white/20 rounded-full flex items-start justify-center p-2">
-            <div className="w-1 h-3 bg-white/40 rounded-full"></div>
-          </div>
+                {/* Value */}
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary-orange mb-1">
+                  {stat.value}
+                </div>
+
+                {/* Label */}
+                <div className="text-xs sm:text-sm text-text-muted">
+                  {stat.label}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
