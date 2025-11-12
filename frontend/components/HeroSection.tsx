@@ -53,38 +53,76 @@ export default function HeroSection() {
           <span className="text-primary-orange font-semibold">Публикуйте бесплатно</span> без регистрации.
         </p>
 
-        {/* Search Bar - упрощенный */}
+        {/* Search Bar - улучшенный премиум дизайн */}
         <form
           onSubmit={handleSearch}
           className="relative max-w-2xl mx-auto animate-fade-up delay-300"
         >
-          <div className="relative">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              placeholder="Введите артикул или название запчасти..."
-              className={`w-full h-12 sm:h-14 lg:h-16 bg-light-bg-secondary dark:bg-dark-bg-secondary border ${
-                isFocused ? 'border-primary-orange' : 'border-light-bg-tertiary dark:border-white/10'
-              } rounded-xl px-4 sm:pl-12 pr-20 sm:pr-28 text-light-text-primary dark:text-dark-text-primary placeholder:text-light-text-muted dark:placeholder:text-dark-text-muted focus:outline-none transition-colors duration-200 text-sm sm:text-base`}
-            />
+          <div className="relative group">
+            {/* Glow эффект при фокусе */}
+            <div className={`absolute -inset-0.5 bg-gradient-to-r from-primary-orange via-primary-orange-hover to-primary-orange rounded-2xl blur-lg opacity-0 group-hover:opacity-20 ${isFocused ? 'opacity-30' : ''} transition-opacity duration-500`}></div>
 
-            {/* Icon внутри input - только на планшетах и выше */}
-            <div className="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 items-center gap-2 text-light-text-muted dark:text-dark-text-muted">
-              <span className="text-xl">🔍</span>
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                placeholder="Введите артикул или название запчасти..."
+                className={`w-full h-14 sm:h-16 lg:h-[72px] bg-white dark:bg-dark-bg-secondary border-2 ${
+                  isFocused
+                    ? 'border-primary-orange shadow-lg shadow-primary-orange/20 dark:shadow-primary-orange/30'
+                    : 'border-gray-200 dark:border-white/10 shadow-md dark:shadow-xl dark:shadow-black/20'
+                } rounded-2xl pl-5 sm:pl-14 lg:pl-16 pr-28 sm:pr-36 lg:pr-40 text-light-text-primary dark:text-dark-text-primary placeholder:text-gray-400 dark:placeholder:text-dark-text-muted focus:outline-none transition-all duration-300 text-base sm:text-lg font-medium backdrop-blur-xl`}
+              />
+
+              {/* SVG Icon внутри input */}
+              <div className={`absolute left-4 sm:left-5 lg:left-6 top-1/2 -translate-y-1/2 transition-all duration-300 ${
+                isFocused ? 'text-primary-orange scale-110' : 'text-gray-400 dark:text-dark-text-muted'
+              }`}>
+                <svg
+                  className="w-5 h-5 sm:w-6 sm:h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+
+              {/* Search button - премиум дизайн */}
+              <button
+                type="submit"
+                disabled={!searchQuery.trim()}
+                className={`absolute right-2 sm:right-2.5 top-1/2 -translate-y-1/2 bg-gradient-to-r from-primary-orange to-primary-orange-hover hover:from-primary-orange-hover hover:to-primary-orange text-white px-5 sm:px-7 lg:px-9 h-10 sm:h-12 lg:h-14 rounded-xl font-semibold transition-all duration-300 shadow-lg shadow-primary-orange/30 hover:shadow-xl hover:shadow-primary-orange/40 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group/btn ${
+                  searchQuery.trim() ? 'animate-pulse-subtle' : ''
+                }`}
+                aria-label="Поиск"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-sm sm:text-base lg:text-lg">Найти</span>
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:translate-x-1 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </span>
+              </button>
             </div>
-
-            {/* Search button - упрощенный */}
-            <button
-              type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary-orange hover:bg-primary-orange-hover text-white px-4 sm:px-6 h-8 sm:h-10 lg:h-12 rounded-lg font-medium transition-colors duration-200"
-              aria-label="Поиск"
-            >
-              <span className="hidden sm:inline">Найти</span>
-              <span className="sm:hidden">→</span>
-            </button>
           </div>
 
           {/* Подсказки под поиском */}
