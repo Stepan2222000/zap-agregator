@@ -165,7 +165,9 @@ export default function PublishPage() {
       const formData = new FormData()
       formData.append('article_number', data.article_number)
       formData.append('condition', data.condition)
-      formData.append('price', data.price)
+      // Убираем форматирование из цены (пробелы) и преобразуем в число
+      const cleanPrice = data.price.replace(/\s/g, '')
+      formData.append('price', cleanPrice)
       formData.append('brand', data.brand)
       if (data.description) {
         formData.append('description', data.description)
