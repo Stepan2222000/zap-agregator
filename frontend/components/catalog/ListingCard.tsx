@@ -47,16 +47,25 @@ export default function ListingCard({
           rounded-xl
           border border-light-bg-tertiary dark:border-dark-bg-tertiary
           group-hover:border-primary-orange
-          shadow-sm group-hover:shadow-xl
-          transition-all duration-300
+
+          shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.06)]
+          group-hover:shadow-[0_8px_30px_rgba(217,119,87,0.12),0_3px_8px_rgba(0,0,0,0.08)]
+          dark:shadow-[0_2px_8px_rgba(0,0,0,0.2),0_1px_2px_rgba(0,0,0,0.3)]
+          dark:group-hover:shadow-[0_8px_30px_rgba(217,119,87,0.25),0_3px_8px_rgba(0,0,0,0.4)]
+
+          transition-all duration-300 ease-out
           cursor-pointer
           overflow-hidden
           h-full flex flex-col
           group-active:scale-[0.98]
+          relative
         "
       >
+        {/* Subtle gradient overlay на фоне карточки при hover */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-gray-50/30 dark:from-dark-bg-secondary dark:via-dark-bg-secondary dark:to-dark-bg-tertiary/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
         {/* Фото + Бэдж состояния */}
-        <div className="relative overflow-hidden bg-light-bg-tertiary dark:bg-dark-bg-tertiary aspect-square">
+        <div className="relative overflow-hidden bg-light-bg-tertiary dark:bg-dark-bg-tertiary aspect-square z-10">
           {imageUrl ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -66,33 +75,42 @@ export default function ListingCard({
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 loading="lazy"
               />
-              {/* Gradient overlay при hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              {/* Улучшенный gradient overlay при hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-3">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-light-bg-secondary dark:bg-dark-bg-tertiary flex items-center justify-center">
-                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-light-text-muted dark:text-dark-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex flex-col items-center justify-center h-full gap-3 relative overflow-hidden">
+              {/* Shimmer animation */}
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-out" />
+
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-light-bg-secondary dark:bg-dark-bg-tertiary flex items-center justify-center relative z-10">
+                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-light-text-muted dark:text-dark-text-muted group-hover:text-primary-orange/50 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span className="text-light-text-muted dark:text-dark-text-muted text-sm font-medium">
+              <span className="text-light-text-muted dark:text-dark-text-muted text-sm font-medium relative z-10">
                 Нет фото
               </span>
             </div>
           )}
 
-          {/* Бэдж состояния */}
+          {/* Бэдж состояния с Glass Morphism */}
           <div
             className={`
               absolute top-2 left-2 px-2.5 py-1 rounded-md
               text-white text-[10px] sm:text-xs font-bold uppercase tracking-wide
-              shadow-md backdrop-blur-sm
+
+              backdrop-blur-md backdrop-saturate-150
+              shadow-[0_4px_12px_rgba(0,0,0,0.15),0_1px_3px_rgba(0,0,0,0.1)]
+              border border-white/20
+
               ${
                 condition === "new"
-                  ? "bg-primary-orange/90"
-                  : "bg-amber-500/90"
+                  ? "bg-gradient-to-br from-primary-orange/95 to-[#C46847]/85"
+                  : "bg-gradient-to-br from-amber-500/95 to-amber-600/85"
               }
+
+              group-hover:scale-105 transition-transform duration-200
             `}
           >
             {condition === "new" ? "New" : "Б/У"}
@@ -100,7 +118,7 @@ export default function ListingCard({
         </div>
 
         {/* Текстовая информация */}
-        <div className="p-3 sm:p-4 flex flex-col flex-grow">
+        <div className="p-3 sm:p-4 flex flex-col flex-grow relative z-10">
           {/* Название (максимум 2 строки) */}
           <h3
             className="
@@ -127,9 +145,9 @@ export default function ListingCard({
             {brand}
           </p>
 
-          {/* Цена */}
+          {/* Цена с glow эффектом */}
           <div className="mt-auto pt-2 border-t border-light-bg-tertiary dark:border-dark-bg-tertiary">
-            <p className="text-base sm:text-lg font-bold text-primary-orange">
+            <p className="text-base sm:text-lg font-bold text-primary-orange group-hover:drop-shadow-[0_0_8px_rgba(217,119,87,0.4)] transition-all duration-300">
               {formatPrice(price)}
             </p>
           </div>

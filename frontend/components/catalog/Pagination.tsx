@@ -83,7 +83,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
           ${
             currentPage === 1
               ? "bg-light-bg-tertiary/50 dark:bg-dark-bg-tertiary/50 text-light-text-muted dark:text-dark-text-muted cursor-not-allowed opacity-50"
-              : "bg-white dark:bg-dark-bg-secondary border-2 border-light-bg-tertiary dark:border-dark-bg-tertiary text-light-text-primary dark:text-dark-text-primary hover:border-primary-orange hover:shadow-md active:scale-95 shadow-sm"
+              : "bg-white dark:bg-dark-bg-secondary border-2 border-light-bg-tertiary dark:border-dark-bg-tertiary text-light-text-primary dark:text-dark-text-primary hover:border-primary-orange hover:shadow-[0_4px_12px_rgba(217,119,87,0.15),0_2px_4px_rgba(0,0,0,0.08)] hover:scale-105 hover:bg-gradient-to-r hover:from-white hover:to-primary-orange/5 dark:hover:from-dark-bg-secondary dark:hover:to-primary-orange/10 active:scale-95 shadow-sm"
           }
         `}
         aria-label="Предыдущая страница"
@@ -118,8 +118,8 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
                 font-bold text-sm transition-all duration-200
                 ${
                   isActive
-                    ? "bg-primary-orange text-white shadow-lg scale-105"
-                    : "bg-white dark:bg-dark-bg-secondary border-2 border-light-bg-tertiary dark:border-dark-bg-tertiary text-light-text-primary dark:text-dark-text-primary hover:border-primary-orange hover:shadow-md active:scale-95 shadow-sm"
+                    ? "bg-gradient-to-r from-primary-orange to-primary-orange-hover text-white shadow-[0_4px_14px_rgba(217,119,87,0.3),0_2px_4px_rgba(0,0,0,0.1)] scale-105 drop-shadow-[0_0_10px_rgba(217,119,87,0.4)]"
+                    : "bg-white dark:bg-dark-bg-secondary border-2 border-light-bg-tertiary dark:border-dark-bg-tertiary text-light-text-primary dark:text-dark-text-primary hover:border-primary-orange hover:shadow-[0_4px_12px_rgba(217,119,87,0.15),0_2px_4px_rgba(0,0,0,0.08)] hover:scale-105 hover:bg-gradient-to-r hover:from-white hover:to-primary-orange/5 dark:hover:from-dark-bg-secondary dark:hover:to-primary-orange/10 active:scale-95 shadow-sm"
                 }
               `}
               aria-label={`Страница ${pageNum}`}
@@ -141,7 +141,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
           ${
             currentPage === totalPages
               ? "bg-light-bg-tertiary/50 dark:bg-dark-bg-tertiary/50 text-light-text-muted dark:text-dark-text-muted cursor-not-allowed opacity-50"
-              : "bg-white dark:bg-dark-bg-secondary border-2 border-light-bg-tertiary dark:border-dark-bg-tertiary text-light-text-primary dark:text-dark-text-primary hover:border-primary-orange hover:shadow-md active:scale-95 shadow-sm"
+              : "bg-white dark:bg-dark-bg-secondary border-2 border-light-bg-tertiary dark:border-dark-bg-tertiary text-light-text-primary dark:text-dark-text-primary hover:border-primary-orange hover:shadow-[0_4px_12px_rgba(217,119,87,0.15),0_2px_4px_rgba(0,0,0,0.08)] hover:scale-105 hover:bg-gradient-to-r hover:from-white hover:to-primary-orange/5 dark:hover:from-dark-bg-secondary dark:hover:to-primary-orange/10 active:scale-95 shadow-sm"
           }
         `}
         aria-label="Следующая страница"

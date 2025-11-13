@@ -4,7 +4,7 @@
  */
 
 import { Suspense } from "react";
-import ListingCard from "@/components/catalog/ListingCard";
+import StaggeredCard from "@/components/catalog/StaggeredCard";
 import SkeletonCard from "@/components/catalog/SkeletonCard";
 import EmptyState from "@/components/catalog/EmptyState";
 import Pagination from "@/components/catalog/Pagination";
@@ -137,9 +137,10 @@ export default async function CatalogPage({
           <>
             <Suspense fallback={<CatalogSkeleton />}>
               <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6 mb-6">
-                {data.items.map((item) => (
-                  <ListingCard
+                {data.items.map((item, index) => (
+                  <StaggeredCard
                     key={item.id}
+                    index={index}
                     id={item.id}
                     articleNumber={item.article_number}
                     brand={item.brand}

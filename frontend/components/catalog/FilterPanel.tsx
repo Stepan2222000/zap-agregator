@@ -177,8 +177,15 @@ export default function FilterPanel({
               border-light-bg-tertiary dark:border-dark-bg-tertiary
               text-light-text-primary dark:text-dark-text-primary
               placeholder-light-text-muted dark:placeholder-dark-text-muted
+
               hover:border-primary-orange/50
-              focus:outline-none focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange
+              hover:shadow-[0_0_0_3px_rgba(217,119,87,0.05)]
+
+              focus:outline-none
+              focus:ring-2 focus:ring-primary-orange/20
+              focus:border-primary-orange
+              focus:shadow-[0_0_0_3px_rgba(217,119,87,0.1),0_0_12px_rgba(217,119,87,0.15)]
+
               transition-all duration-200
               text-sm
               [appearance:textfield]
@@ -198,8 +205,15 @@ export default function FilterPanel({
               border-light-bg-tertiary dark:border-dark-bg-tertiary
               text-light-text-primary dark:text-dark-text-primary
               placeholder-light-text-muted dark:placeholder-dark-text-muted
+
               hover:border-primary-orange/50
-              focus:outline-none focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange
+              hover:shadow-[0_0_0_3px_rgba(217,119,87,0.05)]
+
+              focus:outline-none
+              focus:ring-2 focus:ring-primary-orange/20
+              focus:border-primary-orange
+              focus:shadow-[0_0_0_3px_rgba(217,119,87,0.1),0_0_12px_rgba(217,119,87,0.15)]
+
               transition-all duration-200
               text-sm
               [appearance:textfield]
@@ -225,7 +239,7 @@ export default function FilterPanel({
           </h3>
         </div>
         <div className="space-y-1">
-          <label className="flex items-center cursor-pointer group px-2 py-2.5 rounded-lg hover:bg-light-bg-secondary dark:hover:bg-dark-bg-tertiary transition-colors min-h-[44px]">
+          <label className="flex items-center cursor-pointer group px-2 py-2.5 rounded-lg hover:bg-light-bg-secondary dark:hover:bg-dark-bg-tertiary transition-all duration-200 min-h-[44px] hover:scale-[1.02] active:scale-[0.98]">
             <input
               type="radio"
               name="condition"
@@ -236,7 +250,7 @@ export default function FilterPanel({
             />
             <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary group-hover:text-light-text-primary dark:group-hover:text-dark-text-primary transition-colors font-medium">Любое</span>
           </label>
-          <label className="flex items-center cursor-pointer group px-2 py-2.5 rounded-lg hover:bg-light-bg-secondary dark:hover:bg-dark-bg-tertiary transition-colors min-h-[44px]">
+          <label className="flex items-center cursor-pointer group px-2 py-2.5 rounded-lg hover:bg-light-bg-secondary dark:hover:bg-dark-bg-tertiary transition-all duration-200 min-h-[44px] hover:scale-[1.02] active:scale-[0.98]">
             <input
               type="radio"
               name="condition"
@@ -247,7 +261,7 @@ export default function FilterPanel({
             />
             <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary group-hover:text-light-text-primary dark:group-hover:text-dark-text-primary transition-colors font-medium">Новое</span>
           </label>
-          <label className="flex items-center cursor-pointer group px-2 py-2.5 rounded-lg hover:bg-light-bg-secondary dark:hover:bg-dark-bg-tertiary transition-colors min-h-[44px]">
+          <label className="flex items-center cursor-pointer group px-2 py-2.5 rounded-lg hover:bg-light-bg-secondary dark:hover:bg-dark-bg-tertiary transition-all duration-200 min-h-[44px] hover:scale-[1.02] active:scale-[0.98]">
             <input
               type="radio"
               name="condition"
@@ -278,14 +292,20 @@ export default function FilterPanel({
           onClick={handleApply}
           className="
             flex-1 h-11 px-4
-            bg-primary-orange
-            hover:bg-primary-orange-hover
+
+            bg-gradient-to-r from-primary-orange to-primary-orange-hover
+            hover:from-primary-orange-hover hover:to-primary-orange
+
             active:scale-[0.98]
             text-white font-bold text-sm
             rounded-xl
             transition-all duration-200
-            shadow-sm
-            hover:shadow-lg
+
+            shadow-[0_4px_14px_rgba(217,119,87,0.25),0_2px_4px_rgba(0,0,0,0.1)]
+            hover:shadow-[0_6px_20px_rgba(217,119,87,0.35),0_3px_6px_rgba(0,0,0,0.15)]
+
+            hover:drop-shadow-[0_0_10px_rgba(217,119,87,0.4)]
+
             focus:outline-none focus:ring-2 focus:ring-primary-orange focus:ring-offset-2
           "
         >
@@ -316,24 +336,30 @@ export default function FilterPanel({
     // Модальное окно на мобильных
     return (
       <>
-        {/* Overlay with backdrop blur */}
+        {/* Overlay with enhanced backdrop blur */}
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-in fade-in duration-200"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 animate-in fade-in duration-300 ease-out"
           onClick={onClose}
         />
 
-        {/* Модалка с анимацией slide-up */}
+        {/* Модалка с glass morphism */}
         <div
           className="
             fixed inset-x-0 bottom-0
-            bg-white dark:bg-dark-bg-secondary
-            border-t border-light-bg-tertiary dark:border-dark-bg-tertiary
+
+            bg-white/95 dark:bg-dark-bg-secondary/95
+            backdrop-blur-xl backdrop-saturate-150
+
+            border-t border-light-bg-tertiary/50 dark:border-dark-bg-tertiary/50
             rounded-t-3xl
             z-50
             max-h-[85vh]
             overflow-y-auto
-            shadow-2xl
-            animate-in slide-in-from-bottom duration-300
+
+            shadow-[0_-10px_40px_rgba(0,0,0,0.15),0_-2px_8px_rgba(0,0,0,0.1)]
+            dark:shadow-[0_-10px_40px_rgba(0,0,0,0.5),0_-2px_8px_rgba(0,0,0,0.3)]
+
+            animate-in slide-in-from-bottom duration-300 ease-out
             pb-safe
           "
         >
@@ -351,6 +377,9 @@ export default function FilterPanel({
         rounded-xl
         border border-light-bg-tertiary dark:border-dark-bg-tertiary
         sticky top-6
+
+        shadow-[0_4px_16px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.08)]
+        dark:shadow-[0_4px_16px_rgba(0,0,0,0.3),0_1px_3px_rgba(0,0,0,0.4)]
       "
     >
       {panelContent}
