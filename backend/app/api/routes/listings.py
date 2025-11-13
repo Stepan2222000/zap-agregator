@@ -1,15 +1,20 @@
 """
 API эндпоинты для работы с объявлениями
 """
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, BackgroundTasks, Query
 from typing import List, Optional
 from uuid import UUID
+from decimal import Decimal
 import logging
 
-from app.schemas import ListingCreate, ListingResponse, ListingStatusResponse, PhotoResponse
+from app.schemas import (
+    ListingCreate, ListingResponse, ListingStatusResponse,
+    PhotoResponse, SearchResultResponse
+)
 from app.db.listings_repository import listings_repo
 from app.services.file_upload import file_upload_service
 from app.services.ai_service import ai_service
+from app.services.search_service import search_service
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +103,63 @@ async def create_listing(
         raise HTTPException(
             status_code=500,
             detail="Не удалось создать объявление. Попробуйте позже."
+        )
+
+
+@router.get("/", response_model=SearchResultResponse)
+async def search_listings(
+    q: Optional[str] = Query(None, max_length=255, description="Поиск по артикулу, названию или описанию"),
+    brand: Optional[str] = Query(None, description="Фильтр по марке автомобиля"),
+    condition: Optional[str] = Query(None, regex="^(new|used)$", description="Фильтр по состоянию"),
+    price_min: Optional[Decimal] = Query(None, ge=0, description="Минимальная цена"),
+    price_max: Optional[Decimal] = Query(None, ge=0, description="Максимальная цена"),
+    page: int = Query(1, ge=1, description="Номер страницы"),
+    limit: int = Query(20, ge=1, le=100, description="Количество на странице"),
+):
+    """
+    Поиск и фильтрация объявлений (только approved)
+
+    Story 4.1: Search & Filter API Endpoints
+
+    Параметры:
+    - **q**: Текстовый поиск по артикулу, названию, описанию
+    - **brand**: Фильтр по марке (BMW, Audi, Toyota и т.д.)
+    - **condition**: Фильтр по состоянию ("new" или "used")
+    - **price_min**: Минимальная цена в рублях
+    - **price_max**: Максимальная цена в рублях
+    - **page**: Номер страницы (начинается с 1)
+    - **limit**: Количество результатов на странице (макс 100)
+
+    Возвращает только одобренные объявления (status = 'approved')
+    """
+    try:
+        # Валидация диапазона цен
+        if price_min is not None and price_max is not None and price_min > price_max:
+            raise HTTPException(
+                status_code=400,
+                detail="Минимальная цена не может быть больше максимальной"
+            )
+
+        # Вызов сервиса поиска
+        result = await search_service.search_listings(
+            query=q,
+            brand=brand,
+            condition=condition,
+            price_min=price_min,
+            price_max=price_max,
+            page=page,
+            limit=limit
+        )
+
+        return SearchResultResponse(**result)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Ошибка поиска объявлений: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Ошибка выполнения поиска"
         )
 
 

@@ -140,6 +140,43 @@ zap-agregator/
 
 ---
 
+## Запуск проекта
+
+### Development Mode (разработка)
+Для запуска проекта в режиме разработки с hot-reload используй:
+
+```bash
+./dev.sh
+```
+
+Этот скрипт:
+- Останавливает все старые контейнеры
+- Запускает контейнеры с монтированием кода через volumes
+- Включает hot-reload для автоматической перезагрузки:
+  - Backend (FastAPI) - автоматически перезапускается при изменении .py файлов (~1-2 сек)
+  - Frontend (Next.js) - мгновенно обновляет браузер при изменении .tsx файлов
+
+После запуска доступны:
+- **Frontend:** http://localhost:3000
+- **Backend:** http://localhost:8000
+- **API Docs:** http://localhost:8000/api/docs
+
+### Пересборка образов
+Если изменились зависимости (requirements.txt, package.json) или Dockerfile:
+
+```bash
+./dev.sh --build
+```
+
+### Production Mode
+Для production используй:
+
+```bash
+./restart.sh
+```
+
+---
+
 ## Локализация
 
 - **Язык:** Только русский

@@ -1,0 +1,67 @@
+# Docker Compose для режима разработки (Development Mode)
+# Использование: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  # Backend: Монтируем код для hot-reload
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      # Монтируем исходный код для автоматической перезагрузки
+      - ./backend/app:/app/app:ro
+      # Сохраняем credentials и uploads
+      - ./backend/credentials:/app/credentials:ro
+      - ./backend/uploads:/app/uploads
+    environment:
+      # Dev-режим
+      PYTHONUNBUFFERED: 1
+      WATCHFILES_FORCE_POLLING: "true"
+    # Отключаем healthcheck в dev режиме для быстрого старта
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Frontend: Монтируем код для hot-reload
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    command: npm run dev
+    volumes:
+      # Монтируем только папки с исходным кодом (не весь frontend/)
+      - ./frontend/app:/app/app:cached
+      - ./frontend/components:/app/components:cached
+      - ./frontend/contexts:/app/contexts:cached
+      - ./frontend/public:/app/public:cached
+      - ./frontend/styles:/app/styles:cached
+      # Конфигурационные файлы тоже монтируем
+      - ./frontend/next.config.js:/app/next.config.js:cached
+      - ./frontend/tailwind.config.ts:/app/tailwind.config.ts:cached
+      - ./frontend/tsconfig.json:/app/tsconfig.json:cached
+      - ./frontend/postcss.config.js:/app/postcss.config.js:cached
+      # node_modules и .next НЕ монтируем - используем из образа
+    environment:
+      # Dev переменные
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      INTERNAL_API_URL: ${INTERNAL_API_URL:-http://backend:8000}
+      # Отключаем телеметрию
+      NEXT_TELEMETRY_DISABLED: 1
+      # Для hot-reload на некоторых системах
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    # Отключаем healthcheck в dev режиме
+    healthcheck:
+      disable: true
+
+volumes:
+  backend_uploads:
+    driver: local
+    name: autohub_backend_uploads

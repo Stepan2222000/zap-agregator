@@ -1,9 +1,11 @@
 """
 Главное приложение FastAPI
 """
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
 from app.core.exceptions import (
     global_exception_handler,
@@ -42,6 +44,11 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.include_router(health.router, prefix=settings.API_PREFIX, tags=["health"])
 app.include_router(listings.router, prefix=settings.API_PREFIX, tags=["listings"])
 app.include_router(admin.router, prefix=settings.API_PREFIX, tags=["admin"])
+
+# Статические файлы для изображений
+UPLOADS_DIR = Path(__file__).parent.parent / "uploads"
+UPLOADS_DIR.mkdir(exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 
 @app.on_event("startup")

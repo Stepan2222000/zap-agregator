@@ -1,0 +1,122 @@
+services:
+  # PostgreSQL база данных
+  postgres:
+    image: postgres:14-alpine
+    container_name: autohub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-autohub_ai}
+      POSTGRES_USER: ${POSTGRES_USER:-autohub_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-autohub_password_2024}
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+      TZ: Europe/Moscow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001_initial_schema.sql:ro
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - autohub-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-autohub_user} -d ${POSTGRES_DB:-autohub_ai}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Backend FastAPI приложение
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: autohub-backend
+    restart: unless-stopped
+    environment:
+      # Database
+      # Используем DATABASE_URL из .env если задана, иначе локальную БД
+      DATABASE_URL: ${DATABASE_URL:-postgresql://autohub_user:autohub_password_2024@postgres:5432/autohub_ai}
+      DB_POOL_MIN_SIZE: ${DB_POOL_MIN_SIZE:-5}
+      DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-20}
+
+      # CORS
+      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000","http://127.0.0.1:3000"]}
+
+      # Vertex AI / Gemini
+      VERTEX_AI_PROJECT_ID: ${VERTEX_AI_PROJECT_ID}
+      VERTEX_AI_LOCATION: ${VERTEX_AI_LOCATION:-us-central1}
+      VERTEX_AI_CREDENTIALS_PATH: ${VERTEX_AI_CREDENTIALS_PATH:-/app/credentials/credentials.json}
+      AI_MODEL: ${AI_MODEL:-google/gemini-2.5-pro}
+
+      # Admin
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-simple-token-for-mvp}
+
+      # File Upload
+      UPLOAD_DIR: /app/uploads
+      MAX_FILE_SIZE: ${MAX_FILE_SIZE:-5242880}
+      MAX_PHOTOS_PER_LISTING: ${MAX_PHOTOS_PER_LISTING:-10}
+
+      # Other
+      PYTHONUNBUFFERED: 1
+      TZ: Europe/Moscow
+    volumes:
+      - backend_uploads:/app/uploads
+      # Монтирование credentials для Vertex AI
+      - ./backend/credentials:/app/credentials:ro
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    networks:
+      - autohub-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Next.js приложение
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Переменные для build-time (NEXT_PUBLIC_*)
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    container_name: autohub-frontend
+    restart: unless-stopped
+    environment:
+      # Runtime переменные
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NODE_ENV: production
+      PORT: 3000
+      TZ: Europe/Moscow
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    networks:
+      - autohub-network
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Volumes для персистентного хранения данных
+volumes:
+  postgres_data:
+    driver: local
+    name: autohub_postgres_data
+  backend_uploads:
+    driver: local
+    name: autohub_backend_uploads
+
+# Внутренняя сеть для взаимодействия сервисов
+networks:
+  autohub-network:
+    driver: bridge
+    name: autohub-network

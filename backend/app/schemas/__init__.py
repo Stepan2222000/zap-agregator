@@ -5,7 +5,9 @@ from .listings import (
     ListingCreate,
     ListingResponse,
     PhotoResponse,
-    ListingStatusResponse
+    ListingStatusResponse,
+    ListingPreviewResponse,
+    SearchResultResponse
 )
 
 __all__ = [
@@ -13,4 +15,6 @@ __all__ = [
     "ListingResponse",
     "PhotoResponse",
     "ListingStatusResponse",
+    "ListingPreviewResponse",
+    "SearchResultResponse",
 ]

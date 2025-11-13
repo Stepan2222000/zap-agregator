@@ -73,7 +73,7 @@ export default function PublishPage() {
   const isFieldValid = (fieldName: keyof ListingFormData): boolean => {
     const value = formValues[fieldName]
     const hasError = errors[fieldName]
-    const isFilled = value && String(value).trim() !== ''
+    const isFilled = !!(value && String(value).trim() !== '')
     return isFilled && !hasError
   }
 

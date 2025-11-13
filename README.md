@@ -41,7 +41,29 @@ zap-agregator/
 
 ## 🚀 Быстрый старт
 
-### Требования
+### 🐳 Docker (Рекомендуется)
+
+**Самый простой способ запустить проект:**
+
+```bash
+# Development режим с hot-reload (для разработки)
+./dev.sh
+
+# Production режим (для деплоя)
+./restart.sh
+```
+
+**Требования:**
+- Docker Desktop 4.0+
+- 4GB RAM минимум
+
+📚 Подробнее: см. [DOCKER.md](DOCKER.md) и [DEV_MODE.md](DEV_MODE.md)
+
+---
+
+### 💻 Локальный запуск (без Docker)
+
+**Требования:**
 - Python 3.10 или выше
 - Node.js 18 или выше
 - PostgreSQL 14 или выше

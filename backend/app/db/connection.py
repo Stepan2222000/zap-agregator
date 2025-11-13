@@ -53,9 +53,15 @@ class Database:
 db = Database()
 
 
-def get_db_connection():
-    """
-    Получить соединение из pool.
-    Используется как context manager.
-    """
-    return db.pool.acquire()
+# Context manager для совместимости с существующим кодом
+class get_db_connection:
+    """Context manager для получения соединения из пула"""
+
+    async def __aenter__(self):
+        if not db.pool:
+            raise RuntimeError("База данных не подключена")
+        return await db.pool.acquire()
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        # Connection автоматически возвращается в пул при выходе из контекста
+        pass

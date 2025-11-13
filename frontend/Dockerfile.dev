@@ -1,0 +1,27 @@
+# Frontend Dockerfile для Development режима
+# Этот образ используется для разработки с hot-reload
+
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Установка системных зависимостей
+RUN apk add --no-cache libc6-compat curl
+
+# Копирование package files и установка зависимостей
+COPY package*.json ./
+RUN npm ci
+
+# Копируем конфигурационные файлы (они будут перекрыты volume при запуске, но нужны для сборки)
+COPY next.config.js tsconfig.json postcss.config.js tailwind.config.ts* ./
+
+# Создаем базовые папки для структуры проекта
+RUN mkdir -p app components contexts public styles
+
+# Открытие порта
+EXPOSE 3000
+
+# В dev режиме основной код монтируется через volumes из docker-compose.dev.yml
+# node_modules остаются в контейнере и НЕ перекрываются
+
+CMD ["npm", "run", "dev"]

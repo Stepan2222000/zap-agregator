@@ -149,3 +149,67 @@ class ListingStatusResponse(BaseModel):
                 "updated_at": "2024-01-15T10:30:00"
             }
         }
+
+
+class ListingPreviewResponse(BaseModel):
+    """
+    Упрощённая схема объявления для карточек в каталоге
+    Используется для GET /api/listings (поиск и каталог)
+    """
+    id: UUID = Field(..., description="ID объявления")
+    article_number: str = Field(..., description="Артикул запчасти")
+    brand: str = Field(..., description="Марка автомобиля")
+    condition: Literal['new', 'used'] = Field(..., description="Состояние")
+    price: Decimal = Field(..., description="Цена в рублях")
+    ai_processed_title: Optional[str] = Field(None, description="Название от AI (или описание)")
+    main_photo_url: Optional[str] = Field(None, description="URL главного фото")
+    created_at: datetime = Field(..., description="Дата создания")
+
+    class Config:
+        from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "article_number": "W712/75",
+                "brand": "BMW",
+                "condition": "new",
+                "price": "1250.00",
+                "ai_processed_title": "Масляный фильтр Mann W712/75 для BMW",
+                "main_photo_url": "/uploads/550e8400-e29b-41d4-a716-446655440000/photo1.jpg",
+                "created_at": "2025-11-12T10:30:00Z"
+            }
+        }
+
+
+class SearchResultResponse(BaseModel):
+    """
+    Схема для пагинированных результатов поиска
+    Используется для GET /api/listings с пагинацией
+    """
+    items: list[ListingPreviewResponse] = Field(..., description="Список объявлений")
+    total: int = Field(..., ge=0, description="Общее количество результатов")
+    page: int = Field(..., ge=1, description="Текущая страница")
+    pages: int = Field(..., ge=0, description="Общее количество страниц")
+    limit: int = Field(..., ge=1, le=100, description="Количество на странице")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "items": [
+                    {
+                        "id": "550e8400-e29b-41d4-a716-446655440000",
+                        "article_number": "W712/75",
+                        "brand": "BMW",
+                        "condition": "new",
+                        "price": "1250.00",
+                        "ai_processed_title": "Масляный фильтр Mann W712/75",
+                        "main_photo_url": "/uploads/550e8400-e29b-41d4-a716-446655440000/photo1.jpg",
+                        "created_at": "2025-11-12T10:30:00Z"
+                    }
+                ],
+                "total": 150,
+                "page": 1,
+                "pages": 8,
+                "limit": 20
+            }
+        }
