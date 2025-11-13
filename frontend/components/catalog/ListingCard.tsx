@@ -46,19 +46,21 @@ export default function ListingCard({
           bg-white dark:bg-dark-bg-secondary
           rounded-xl
           border border-light-bg-tertiary dark:border-dark-bg-tertiary
-          group-hover:border-primary-orange
+          group-hover:border-primary-orange/60
 
           shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.06)]
-          group-hover:shadow-[0_8px_30px_rgba(217,119,87,0.12),0_3px_8px_rgba(0,0,0,0.08)]
+          group-hover:shadow-[0_8px_30px_rgba(217,119,87,0.12),0_3px_8px_rgba(0,0,0,0.08),0_0_0_1px_rgba(217,119,87,0.2)]
           dark:shadow-[0_2px_8px_rgba(0,0,0,0.2),0_1px_2px_rgba(0,0,0,0.3)]
-          dark:group-hover:shadow-[0_8px_30px_rgba(217,119,87,0.25),0_3px_8px_rgba(0,0,0,0.4)]
+          dark:group-hover:shadow-[0_8px_30px_rgba(217,119,87,0.25),0_3px_8px_rgba(0,0,0,0.4),0_0_0_1px_rgba(217,119,87,0.3)]
 
-          transition-all duration-300 ease-out
+          transition-all duration-500 ease-out
           cursor-pointer
           overflow-hidden
           h-full flex flex-col
           group-active:scale-[0.98]
           relative
+
+          group-hover:ring-1 group-hover:ring-primary-orange/30
         "
       >
         {/* Subtle gradient overlay на фоне карточки при hover */}
@@ -72,7 +74,7 @@ export default function ListingCard({
               <img
                 src={imageUrl}
                 alt={title}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.15] transition-transform duration-700 ease-out"
                 loading="lazy"
               />
               {/* Улучшенный gradient overlay при hover */}
@@ -102,15 +104,16 @@ export default function ListingCard({
 
               backdrop-blur-md backdrop-saturate-150
               shadow-[0_4px_12px_rgba(0,0,0,0.15),0_1px_3px_rgba(0,0,0,0.1)]
+              group-hover:shadow-[0_6px_16px_rgba(0,0,0,0.2),0_2px_4px_rgba(0,0,0,0.15)]
               border border-white/20
 
               ${
                 condition === "new"
-                  ? "bg-gradient-to-br from-primary-orange/95 to-[#C46847]/85"
-                  : "bg-gradient-to-br from-amber-500/95 to-amber-600/85"
+                  ? "bg-gradient-to-br from-primary-orange/95 to-[#C46847]/85 group-hover:from-primary-orange group-hover:to-[#C46847]/95"
+                  : "bg-gradient-to-br from-amber-500/95 to-amber-600/85 group-hover:from-amber-500 group-hover:to-amber-600/95"
               }
 
-              group-hover:scale-105 transition-transform duration-200
+              group-hover:scale-110 transition-all duration-300 ease-out
             `}
           >
             {condition === "new" ? "New" : "Б/У"}
@@ -137,7 +140,7 @@ export default function ListingCard({
 
           {/* Артикул */}
           <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mb-1">
-            <span className="font-medium">{articleNumber}</span>
+            <span className="font-semibold tracking-wide">{articleNumber}</span>
           </p>
 
           {/* Марка */}
@@ -145,9 +148,12 @@ export default function ListingCard({
             {brand}
           </p>
 
-          {/* Цена с glow эффектом */}
-          <div className="mt-auto pt-2 border-t border-light-bg-tertiary dark:border-dark-bg-tertiary">
-            <p className="text-base sm:text-lg font-bold text-primary-orange group-hover:drop-shadow-[0_0_8px_rgba(217,119,87,0.4)] transition-all duration-300">
+          {/* Цена с glow эффектом и gradient разделителем */}
+          <div className="mt-auto pt-2 relative">
+            {/* Gradient divider */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-light-bg-tertiary to-transparent dark:via-dark-bg-tertiary" />
+
+            <p className="text-base sm:text-lg font-bold text-primary-orange group-hover:drop-shadow-[0_0_12px_rgba(217,119,87,0.5)] group-hover:scale-105 transition-all duration-300 origin-left">
               {formatPrice(price)}
             </p>
           </div>

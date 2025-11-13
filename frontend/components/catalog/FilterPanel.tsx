@@ -47,6 +47,13 @@ export default function FilterPanel({
   const [condition, setCondition] = useState(searchParams.get("condition") || "");
   const [priceError, setPriceError] = useState("");
 
+  // Подсчет активных фильтров
+  const activeFiltersCount =
+    (priceMin ? 1 : 0) +
+    (priceMax ? 1 : 0) +
+    (brand ? 1 : 0) +
+    (condition ? 1 : 0);
+
   // Обновить локальное состояние при изменении URL
   useEffect(() => {
     setPriceMin(searchParams.get("price_min") || "");
@@ -146,6 +153,18 @@ export default function FilterPanel({
             <h2 className="text-lg font-bold text-light-text-primary dark:text-dark-text-primary">
               Фильтры
             </h2>
+            {activeFiltersCount > 0 && (
+              <span className="
+                min-w-[22px] h-[22px] px-1.5
+                flex items-center justify-center
+                bg-gradient-to-br from-primary-orange to-primary-orange-hover
+                text-white text-xs font-bold rounded-full
+                shadow-[0_2px_8px_rgba(217,119,87,0.3)]
+                animate-in zoom-in duration-200
+              ">
+                {activeFiltersCount}
+              </span>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -388,7 +407,13 @@ export default function FilterPanel({
 }
 
 // Кнопка открытия фильтров для мобильных
-export function FilterButton({ onClick }: { onClick: () => void }) {
+export function FilterButton({
+  onClick,
+  activeCount = 0
+}: {
+  onClick: () => void;
+  activeCount?: number;
+}) {
   return (
     <button
       onClick={onClick}
@@ -408,10 +433,25 @@ export function FilterButton({ onClick }: { onClick: () => void }) {
         shadow-sm
         hover:shadow-md
         focus:outline-none focus:ring-2 focus:ring-primary-orange/20
+        relative
       "
     >
       <SlidersHorizontal className="w-4 h-4" />
       Фильтры
+      {activeCount > 0 && (
+        <span className="
+          absolute -top-1.5 -right-1.5
+          min-w-[20px] h-[20px] px-1.5
+          flex items-center justify-center
+          bg-gradient-to-br from-primary-orange to-primary-orange-hover
+          text-white text-xs font-bold rounded-full
+          shadow-[0_2px_8px_rgba(217,119,87,0.4)]
+          animate-in zoom-in duration-200
+          ring-2 ring-white dark:ring-dark-bg
+        ">
+          {activeCount}
+        </span>
+      )}
     </button>
   );
 }

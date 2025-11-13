@@ -59,21 +59,25 @@ export default function SearchBar({ sticky = false }: SearchBarProps) {
             rounded-xl
             text-light-text-primary dark:text-dark-text-primary
             placeholder-light-text-muted dark:placeholder-dark-text-muted
+
             focus:outline-none
             focus:ring-4 focus:ring-primary-orange/20
             focus:border-primary-orange
-            hover:border-light-text-muted dark:hover:border-dark-text-muted
+
+            hover:border-primary-orange/40
+            hover:shadow-[0_0_0_4px_rgba(217,119,87,0.08),0_2px_8px_rgba(0,0,0,0.04)]
+
+            focus:shadow-[0_0_0_4px_rgba(217,119,87,0.15),0_4px_20px_rgba(217,119,87,0.2),0_2px_8px_rgba(0,0,0,0.1)]
+
             transition-all duration-300
             text-base
-            shadow-sm
-            focus:shadow-lg
           "
         />
 
         {/* Search icon inside input */}
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted pointer-events-none group-focus-within:text-primary-orange transition-colors duration-200" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-light-text-muted dark:text-dark-text-muted pointer-events-none group-focus-within:text-primary-orange group-focus-within:scale-110 transition-all duration-300" />
 
-        {/* Submit button (visually hidden but accessible) */}
+        {/* Submit button with gradient and glow */}
         <button
           type="submit"
           className="
@@ -81,15 +85,22 @@ export default function SearchBar({ sticky = false }: SearchBarProps) {
             h-7
             px-4
             flex items-center justify-center gap-1.5
-            bg-primary-orange
+
+            bg-gradient-to-r from-primary-orange to-primary-orange-hover
+            hover:from-primary-orange-hover hover:to-primary-orange
+
             text-white
-            text-sm font-medium
+            text-sm font-bold
             rounded-lg
-            hover:bg-primary-orange-hover
+
             active:scale-95
             transition-all duration-200
+
             focus:outline-none focus:ring-2 focus:ring-primary-orange focus:ring-offset-2
-            shadow-sm hover:shadow-md
+
+            shadow-[0_2px_8px_rgba(217,119,87,0.25)]
+            hover:shadow-[0_4px_14px_rgba(217,119,87,0.35),0_2px_4px_rgba(0,0,0,0.1)]
+            hover:drop-shadow-[0_0_8px_rgba(217,119,87,0.4)]
           "
           aria-label="Искать"
         >

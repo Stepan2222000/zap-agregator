@@ -7,6 +7,7 @@
  */
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import FilterPanel, { FilterButton } from "./FilterPanel";
 import SearchBar from "./SearchBar";
 import FilterChips from "./FilterChips";
@@ -17,6 +18,14 @@ interface CatalogClientProps {
 
 export default function CatalogClient({ children }: CatalogClientProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const searchParams = useSearchParams();
+
+  // Подсчет активных фильтров
+  const activeFiltersCount =
+    (searchParams.get("price_min") ? 1 : 0) +
+    (searchParams.get("price_max") ? 1 : 0) +
+    (searchParams.get("brand") ? 1 : 0) +
+    (searchParams.get("condition") ? 1 : 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -31,7 +40,10 @@ export default function CatalogClient({ children }: CatalogClientProps) {
       {/* Поисковая строка */}
       <div className="flex items-center gap-3 mb-4">
         <SearchBar />
-        <FilterButton onClick={() => setIsFilterOpen(true)} />
+        <FilterButton
+          onClick={() => setIsFilterOpen(true)}
+          activeCount={activeFiltersCount}
+        />
       </div>
 
       {/* Активные фильтры (chips) */}
