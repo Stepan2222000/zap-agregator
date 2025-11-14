@@ -17,6 +17,8 @@ export default function SkeletonCard() {
 
         shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.06)]
         dark:shadow-[0_2px_8px_rgba(0,0,0,0.2),0_1px_2px_rgba(0,0,0,0.3)]
+
+        animate-pulse
       "
     >
       {/* Skeleton для фото с shimmer эффектом */}

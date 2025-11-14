@@ -61,10 +61,18 @@ export default function ListingCard({
           relative
 
           group-hover:ring-1 group-hover:ring-primary-orange/30
+          group-hover:-translate-y-1
         "
       >
         {/* Subtle gradient overlay на фоне карточки при hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-gray-50/30 dark:from-dark-bg-secondary dark:via-dark-bg-secondary dark:to-dark-bg-tertiary/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+        {/* Shine effect - блестящий эффект при hover */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out">
+            <div className="absolute inset-0 w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/20 dark:via-white/10 to-transparent skew-x-[-20deg]" />
+          </div>
+        </div>
 
         {/* Фото + Бэдж состояния */}
         <div className="relative overflow-hidden bg-light-bg-tertiary dark:bg-dark-bg-tertiary aspect-square z-10">

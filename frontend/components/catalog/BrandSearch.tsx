@@ -75,17 +75,25 @@ export default function BrandSearch({ value, onChange, brands }: BrandSearchProp
         </span>
         <div className="flex items-center gap-1.5">
           {value && (
-            <button
-              type="button"
+            <div
+              role="button"
+              tabIndex={0}
               onClick={(e) => {
                 e.stopPropagation();
                 handleClear();
               }}
-              className="w-5 h-5 flex items-center justify-center hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleClear();
+                }
+              }}
+              className="w-5 h-5 flex items-center justify-center hover:bg-light-bg-tertiary dark:hover:bg-dark-bg-tertiary rounded-md transition-colors cursor-pointer"
               aria-label="Очистить"
             >
               <X className="w-3.5 h-3.5" />
-            </button>
+            </div>
           )}
           <ChevronDown
             className={`w-4 h-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}

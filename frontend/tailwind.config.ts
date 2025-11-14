@@ -43,9 +43,29 @@ const config: Config = {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
         },
+        shine: {
+          '0%': { transform: 'translateX(-100%) translateY(-100%) rotate(30deg)' },
+          '100%': { transform: 'translateX(100%) translateY(100%) rotate(30deg)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-4px)' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { opacity: '0.6' },
+          '50%': { opacity: '1' },
+        },
+        'scale-in': {
+          '0%': { transform: 'scale(0.9)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
       },
       animation: {
         shimmer: 'shimmer 2s ease-in-out infinite',
+        shine: 'shine 3s ease-in-out infinite',
+        float: 'float 3s ease-in-out infinite',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        'scale-in': 'scale-in 0.3s ease-out',
       },
     },
   },

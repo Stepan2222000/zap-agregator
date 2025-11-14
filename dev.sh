@@ -53,12 +53,30 @@ check_docker() {
         exit 1
     fi
 
-    if ! docker info &> /dev/null; then
-        print_error "Docker daemon не запущен! Запустите Docker Desktop."
-        exit 1
-    fi
+    # Проверка Docker daemon с retry логикой (если Docker еще запускается)
+    local max_attempts=10
+    local attempt=1
 
-    print_success "Docker работает"
+    while [ $attempt -le $max_attempts ]; do
+        if docker info &> /dev/null; then
+            print_success "Docker работает"
+            return 0
+        fi
+
+        if [ $attempt -eq 1 ]; then
+            echo -ne "${YELLOW}⏳${NC} Ожидание запуска Docker daemon..."
+        else
+            echo -ne "\r${YELLOW}⏳${NC} Ожидание запуска Docker daemon... ($attempt/$max_attempts)"
+        fi
+
+        sleep 2
+        ((attempt++))
+    done
+
+    echo ""
+    print_error "Docker daemon не запущен после $max_attempts попыток!"
+    print_warning "Запустите Docker Desktop и попробуйте снова."
+    exit 1
 }
 
 # Проверка файла .env

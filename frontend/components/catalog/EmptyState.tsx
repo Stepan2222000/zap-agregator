@@ -21,20 +21,20 @@ export default function EmptyState({ hasFilters = false }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-4 min-h-[50vh]">
       <div className="max-w-md w-full text-center">
-        {/* SVG иконка с glow эффектом */}
+        {/* SVG иконка с glow эффектом и float анимацией */}
         <div className="mb-8 animate-in fade-in zoom-in-95 duration-700 delay-150">
           {hasFilters ? (
-            <div className="relative inline-block">
-              {/* Glow effect за иконкой */}
-              <div className="absolute inset-0 blur-2xl bg-primary-orange/10 rounded-full animate-pulse" />
-              <svg className="w-24 h-24 mx-auto text-light-text-muted dark:text-dark-text-muted opacity-40 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="relative inline-block animate-float">
+              {/* Glow effect за иконкой с pulse-glow */}
+              <div className="absolute inset-0 blur-3xl bg-primary-orange/15 rounded-full animate-pulse-glow" />
+              <svg className="w-24 h-24 mx-auto text-light-text-muted dark:text-dark-text-muted opacity-40 relative z-10 transition-all duration-500 hover:opacity-60 hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
           ) : (
-            <div className="relative inline-block">
-              <div className="absolute inset-0 blur-2xl bg-primary-orange/10 rounded-full animate-pulse" />
-              <svg className="w-24 h-24 mx-auto text-light-text-muted dark:text-dark-text-muted opacity-40 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="relative inline-block animate-float">
+              <div className="absolute inset-0 blur-3xl bg-primary-orange/15 rounded-full animate-pulse-glow" />
+              <svg className="w-24 h-24 mx-auto text-light-text-muted dark:text-dark-text-muted opacity-40 relative z-10 transition-all duration-500 hover:opacity-60 hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>

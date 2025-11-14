@@ -9,6 +9,7 @@ import SkeletonCard from "@/components/catalog/SkeletonCard";
 import EmptyState from "@/components/catalog/EmptyState";
 import Pagination from "@/components/catalog/Pagination";
 import CatalogClient from "@/components/catalog/CatalogClient";
+import ResultsCounter from "@/components/catalog/ResultsCounter";
 
 // Для SSR используем INTERNAL_API_URL (внутри Docker), для CSR - NEXT_PUBLIC_API_URL
 const API_BASE_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -113,29 +114,14 @@ export default async function CatalogPage({
 
   return (
     <div className="min-h-screen bg-light-bg dark:bg-dark-bg">
-      <CatalogClient>
-        {/* Количество результатов */}
-        {data.items.length > 0 && (
-          <div className="mb-4">
-            <p className="text-light-text-secondary dark:text-dark-text-secondary text-sm font-semibold flex items-center gap-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-primary-orange animate-pulse" />
-              Найдено{" "}
-              <span className="text-primary-orange font-bold text-base">
-                {data.total}
-              </span>{" "}
-              {data.total === 1
-                ? "объявление"
-                : data.total < 5
-                ? "объявления"
-                : "объявлений"}
-            </p>
-          </div>
-        )}
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <CatalogClient>
+          {/* Количество результатов с анимированным счетчиком */}
+          {data.items.length > 0 && <ResultsCounter total={data.total} />}
 
-        {/* Сетка карточек или Empty State */}
-        {data.items.length > 0 ? (
-          <>
-            <Suspense fallback={<CatalogSkeleton />}>
+          {/* Сетка карточек или Empty State */}
+          {data.items.length > 0 ? (
+            <>
               <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6 mb-6">
                 {data.items.map((item, index) => (
                   <StaggeredCard
@@ -151,15 +137,15 @@ export default async function CatalogPage({
                   />
                 ))}
               </div>
-            </Suspense>
 
-            {/* Пагинация */}
-            <Pagination currentPage={data.page} totalPages={data.pages} />
-          </>
-        ) : (
-          <EmptyState hasFilters={hasFilters} />
-        )}
-      </CatalogClient>
+              {/* Пагинация */}
+              <Pagination currentPage={data.page} totalPages={data.pages} />
+            </>
+          ) : (
+            <EmptyState hasFilters={hasFilters} />
+          )}
+        </CatalogClient>
+      </Suspense>
     </div>
   );
 }
